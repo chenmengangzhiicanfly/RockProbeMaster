@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/videoWidget">
+        <file>images/ahead.png</file>
+        <file>images/back.png</file>
+        <file>images/Fullscreen.png</file>
+        <file>images/novoice.png</file>
+        <file>images/play.png</file>
+        <file>images/select.png</file>
+        <file>images/speed.png</file>
+        <file>images/stop.png</file>
+        <file>images/videoahead.png</file>
+        <file>images/voice.png</file>
+    </qresource>
+</RCC>
