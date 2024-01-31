@@ -11,7 +11,7 @@
 #include <QLabel>
 #include <QTime>
 
-
+//该模块为视频复查模块，功能为弹出新的窗口，打开输入的视频，进行视频的播放快进暂停并可修改视频对应信息
 namespace Ui {
 class VideoReviewWidget;
 }
@@ -71,6 +71,10 @@ private slots:
 
     void getPlayResource();
     void togglePlayPause();
+    void voicechange(int voice);
+    void aheadClick();
+    void backClick();
+    void speedChange(int value);
 };
 
 

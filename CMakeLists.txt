@@ -11,7 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 # opencv
-set(OpenCV_DIR E:/rockprobe/opencv/build)
+#set(OpenCV_DIR E:/rockprobe/opencv/build)
+set(OpenCV_DIR G:/opencv/opencv/build)
 find_package(OpenCV REQUIRED)
 #message(STATUS  "OpenCV library status:")
 #message(STATUS "    version: ${OpenCV_VERSION}")
@@ -30,14 +31,16 @@ include_directories(${CUDA_INCLUDE_DIRS})
 enable_language(CUDA)
 
 #tensorrt
-set(TRT_DIR "E:/4060deepsort/TensorRT-8.6.1.6")
-
+#set(TRT_DIR "E:/4060deepsort/TensorRT-8.6.1.6")
+set(TRT_DIR "G:/winDeepsort/TensorRT-7.2.3.4")
 
 
 #5.设置Eigen路径,我用的是Eigen-3.3.9.zip(set the path of Eigen)
-set(Eigen3_PATH E:/4060deepsort/eigen-3.4.0)
+#set(Eigen3_PATH E:/4060deepsort/eigen-3.4.0)
+set(Eigen3_PATH G:/winDeepsort/eigen-3.4.0)
 #6.设置dirent路径(set the path of Dirent, download it from https://codeload.github.com/tronkko/dirent/zip/refs/heads/master)
-set(Dirent_INCLUDE_DIRS "E:/4060deepsort/dirent-master/include") #11
+#set(Dirent_INCLUDE_DIRS "E:/4060deepsort/dirent-master/include") #11
+set(Dirent_INCLUDE_DIRS "G:/winDeepsort/dirent-master/include")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
@@ -49,14 +52,14 @@ add_subdirectory(QXlsx)
 
 
 include_directories(${TRT_DIR}/include)
-include_directories(F:/QTProject/02_project/count/Include)
+include_directories(G:/qtproject/count/Include)
 
 include_directories(
         ${Eigen3_PATH}
         ${Dirent_INCLUDE_DIRS}
 )
 
-link_directories(F:/QTProject/02_project/count/Lib)
+link_directories(G:/qtproject/count/Lib)
 
 link_directories(${TRT_DIR}/lib)
 link_directories(${OpenCV_LIB_DIRS})
@@ -114,8 +117,9 @@ endif()
 
 
 
-target_link_libraries(RockProbeMaster PRIVATE nvinfer nvinfer_plugin
-nvinfer_dispatch nvinfer_lean nvonnxparser nvinfer_vc_plugin nvparsers)
+#target_link_libraries(RockProbeMaster PRIVATE nvinfer nvinfer_plugin
+#nvinfer_dispatch nvinfer_lean nvonnxparser nvinfer_vc_plugin nvparsers)
+target_link_libraries(RockProbeMaster PRIVATE myelin64_1 nvinfer nvinfer_plugin nvonnxparser nvparsers)
 #target_link_libraries(RockProbeMaster PRIVATE nvinfer nvonnxparser)
 target_link_libraries(RockProbeMaster PRIVATE deepsort.lib yolosort.lib yolov5_trt.lib)
 target_link_libraries(RockProbeMaster PRIVATE Qt6::Sql)

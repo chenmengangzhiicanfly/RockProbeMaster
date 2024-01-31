@@ -36,9 +36,10 @@ int main(int argc, char *argv[])
 
 //    DetectorManager& detectorManager = DetectorManagerSingleton::getInstance();
 //    detectorManager.Init(1);
-    MainWindow w;
-    w.show();
-
+//    MainWindow w;
+//    w.show();
+    VideoReviewWidget v;
+    v.show();
 
     // 在这里添加你的初始化代码，例如加载资源、配置等
     // 模拟应用程序启动的耗时操作

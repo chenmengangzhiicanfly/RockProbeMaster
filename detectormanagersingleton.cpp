@@ -10,3 +10,4 @@ DetectorManager &DetectorManagerSingleton::getInstance()
 {
     return instance;
 }
+

@@ -28,9 +28,13 @@ VideoReviewWidget::VideoReviewWidget(QWidget *parent) :
     vlayout->addLayout(hlayout, 0);
 
     setFixedSize(1024,600);
+
     connect(player,&QMediaPlayer::durationChanged,this,&VideoReviewWidget::onDurationChanged);
+
     connect(player,&QMediaPlayer::positionChanged,this,&VideoReviewWidget::onPositionChanged);
+
     connect(m_Progressslider,&QSlider::sliderMoved,this,&VideoReviewWidget::videobySlider);
+
 
 }
 
@@ -59,9 +63,11 @@ void VideoReviewWidget::Init()
 
 
     /*倍速控件*/
+    m_speedlabel = new QLabel();
+    m_speedlabel->setFixedSize(60,20);
     m_speedbutton = new QPushButton();
 
-    m_speedlabel = new QLabel();
+
     m_speedslider = new QSlider(Qt::Horizontal);
     m_speedslider->setRange(0,8);
     m_speedslider->setTickInterval(1);
@@ -73,7 +79,7 @@ void VideoReviewWidget::Init()
 
     /*控制视频播放按键*/
     m_palybutton = new QPushButton();
-    m_stopbutton = new QPushButton();
+//    m_stopbutton = new QPushButton();
 
     m_backbutton = new QPushButton();
 
@@ -103,16 +109,22 @@ void VideoReviewWidget::Init()
     hlayout->addWidget(m_speedlabel);
     hlayout->addStretch();
     hlayout->addWidget(m_palybutton);
-    hlayout->addWidget(m_stopbutton);
+//    hlayout->addWidget(m_stopbutton);
     hlayout->addWidget(m_backbutton);
     hlayout->addWidget(m_aheadbutton);
     hlayout->addWidget(m_fullscreen);
     hlayout->addWidget(m_selectbutton);
     hlayout->addWidget(m_timelabel);
-
+    /*选择视频播放文件*/
     connect(m_selectbutton,&QPushButton::clicked,this,&VideoReviewWidget::getPlayResource);
+    /*暂停*/
     connect(m_palybutton,&QPushButton::clicked,this,&VideoReviewWidget::togglePlayPause);
-
+    /*声音*/
+    connect(m_voiceslider, &QAbstractSlider::valueChanged, this, &VideoReviewWidget::voicechange);
+    /*快进*/
+    connect(m_aheadbutton,&QPushButton::clicked,this,&VideoReviewWidget::aheadClick);
+    connect(m_backbutton,&QPushButton::clicked,this,&VideoReviewWidget::backClick);
+    connect(m_speedslider,&QAbstractSlider::valueChanged,this,&VideoReviewWidget::speedChange);
 
 }
 
@@ -132,7 +144,7 @@ void VideoReviewWidget::buttonStyleInit()
 
     ButtonStyleSet(m_palybutton, ":/videoWidget/images/play.png");
 
-    ButtonStyleSet(m_stopbutton, ":/videoWidget/images/stop.png");
+//    ButtonStyleSet(m_stopbutton, ":/videoWidget/images/stop.png");
 
     ButtonStyleSet(m_backbutton, ":/videoWidget/images/back.png");
 

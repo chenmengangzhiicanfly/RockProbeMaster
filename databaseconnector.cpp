@@ -9,11 +9,11 @@ DatabaseConnector::DatabaseConnector()
 {
   qDebug()<<"数据库的线程地址是："<<QThread::currentThread();
   QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-  db.setHostName("localhost");
+  db.setHostName("127.0.0.1");
   db.setPort(3306);
   db.setUserName("root");
-  db.setPassword("123456");
-  db.setDatabaseName("mydata");
+  db.setPassword("xiao");
+  db.setDatabaseName("test");
   if (!db.open()) {
     QMessageBox::critical(nullptr, "错误", db.lastError().text());
     }

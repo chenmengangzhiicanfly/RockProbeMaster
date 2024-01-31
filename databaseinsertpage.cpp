@@ -15,7 +15,7 @@ DatabaseInsertPage::~DatabaseInsertPage()
 }
 
 
-
+//插入数据
 void DatabaseInsertPage::on_verifyButton_clicked()
 {
     QString insertSql=QString("insert into rockprobemaster(id,"

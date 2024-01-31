@@ -389,10 +389,10 @@ void MainWindow::on_startDetectionButton_clicked()
 
         qDebug()<<"检测的线程地址是："<<QThread::currentThread();
             std::string str = filePath.toStdString();
-        detectorManager->DetectAsync(str,p2, [](DetectLog detectlog) {
-            qDebug() <<QString::fromStdString(detectlog.ToString());
-//                this->ui->resultText->setText("为u");
-        });
+//        detectorManager->DetectAsync(str,p2, [](DetectLog detectlog) {
+//            qDebug() <<QString::fromStdString(detectlog.ToString());
+////                this->ui->resultText->setText("为u");
+//        });
 
 
 }
