@@ -17,6 +17,7 @@
 #include <QtConcurrent/QtConcurrentRun>
 #include "detectormanagersingleton.h"
 #include "videoreviewwidget.h"
+#include "videoinfoopt.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -40,6 +41,8 @@ int main(int argc, char *argv[])
 //    w.show();
     VideoReviewWidget v;
     v.show();
+//    videoInfoOpt vifo;
+//    vifo.show();
 
     // 在这里添加你的初始化代码，例如加载资源、配置等
     // 模拟应用程序启动的耗时操作

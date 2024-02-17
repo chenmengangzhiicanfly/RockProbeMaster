@@ -10,7 +10,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QTime>
-
+#include "videoinfoopt.h"
 //该模块为视频复查模块，功能为弹出新的窗口，打开输入的视频，进行视频的播放快进暂停并可修改视频对应信息
 namespace Ui {
 class VideoReviewWidget;
@@ -23,6 +23,8 @@ class VideoReviewWidget : public QWidget
     QMediaPlayer* player;
     QVideoWidget* videoWidget;
     QAudioOutput* audiooutput;
+
+    videoInfoOpt* videoinfoopt;
 
     QPushButton* m_voicebutton;
     QSlider* m_voiceslider;
@@ -42,7 +44,12 @@ class VideoReviewWidget : public QWidget
 
     QLabel* m_timelabel;
 
+    QHBoxLayout* all_hlayout;
+    QVBoxLayout* vlayout;
     QHBoxLayout* hlayout;
+
+//    QHBoxLayout* hlayout = new QHBoxLayout(this);
+
 
     QString m_resource;
 

@@ -9,6 +9,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#qtpropertybrowser
+include_directories(D:/Qt/6.4.3/Src/qttools/src/shared/qtpropertybrowser)
+file(GLOB QT_PROPERTY_BROWSER_SRC D:/Qt/6.4.3/Src/qttools/src/shared/qtpropertybrowser/*.cpp)
+
 
 # opencv
 #set(OpenCV_DIR E:/rockprobe/opencv/build)
@@ -77,7 +81,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         RockProbeMaster.qrc
         "rockprobe.rc"
-
+        ${QT_PROPERTY_BROWSER_SRC}
 
         form.h form.cpp form.ui
         registerwidget.h registerwidget.cpp registerwidget.ui
@@ -93,6 +97,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         detectormanagersingleton.h detectormanagersingleton.cpp videoreviewslots.cpp
         workspacefilemanager.h workspacefilemanager.cpp workspacefilemanager.ui
         workspaceopener.h workspaceopener.cpp workspaceopener.ui
+        videoinfoopt.h videoinfoopt.cpp videoinfoopt.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET RockProbeMaster APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

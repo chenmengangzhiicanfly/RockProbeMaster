@@ -11,11 +11,18 @@ VideoReviewWidget::VideoReviewWidget(QWidget *parent) :
 
     player = new QMediaPlayer;
     player->setPlaybackRate(1.0);    //设置播放速度
-    QVBoxLayout *vlayout = new QVBoxLayout(this);
+
+    all_hlayout = new QHBoxLayout(this);
+    vlayout = new QVBoxLayout(this);
     hlayout = new QHBoxLayout(this);
 
+//    QVBoxLayout *vlayout1 = new QVBoxLayout(this);
+//    all_hlayout->setDirection(QBoxLayout::LeftToRight);
+
     videoWidget = new QVideoWidget(this);
-    videoWidget->setAspectRatioMode(Qt::IgnoreAspectRatio);//缩放适应videoWidget的大小
+//    videoWidget->setAspectRatioMode(Qt::IgnoreAspectRatio);//缩放适应videoWidget的大小
+//    videoinfoopt=new videoInfoOpt(this);
+
 
     player->setVideoOutput(videoWidget);
     player->setAudioOutput(audiooutput);
@@ -23,11 +30,26 @@ VideoReviewWidget::VideoReviewWidget(QWidget *parent) :
     Init();
     buttonStyleInit();
 
+
+
     vlayout->addWidget(videoWidget,1);
     vlayout->addWidget(m_Progressslider,1);
     vlayout->addLayout(hlayout, 0);
 
-    setFixedSize(1024,600);
+//    vlayout->addWidget(videoinfoopt,1);
+//    vlayout1->addWidget(videoinfoopt,1);
+
+    all_hlayout->addLayout(vlayout,0);
+//    all_hlayout->addStretch();
+//    all_hlayout->addLayout(vlayout1,1);
+    videoinfoopt=new videoInfoOpt(this);
+    all_hlayout->addWidget(videoinfoopt,1);
+
+
+
+
+    resize(1500,600);
+
 
     connect(player,&QMediaPlayer::durationChanged,this,&VideoReviewWidget::onDurationChanged);
 
