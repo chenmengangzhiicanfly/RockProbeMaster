@@ -73,7 +73,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         RockProbeMaster.qrc
-        "rockprobe.rc"
 
 
         form.h form.cpp form.ui
@@ -90,6 +89,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         detectormanagersingleton.h detectormanagersingleton.cpp videoreviewslots.cpp
         workspacefilemanager.h workspacefilemanager.cpp workspacefilemanager.ui
         workspaceopener.h workspaceopener.cpp workspaceopener.ui
+        mainwindowonlydetect.cpp
+        detectorsizesettings.h detectorsizesettings.cpp detectorsizesettings.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET RockProbeMaster APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

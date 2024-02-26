@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1027</width>
-    <height>673</height>
+    <width>1021</width>
+    <height>670</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>50</y>
-      <width>961</width>
-      <height>561</height>
+      <x>10</x>
+      <y>10</y>
+      <width>1011</width>
+      <height>601</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -418,32 +418,22 @@
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>20</x>
         <y>30</y>
         <width>931</width>
-        <height>351</height>
+        <height>391</height>
        </rect>
       </property>
       <property name="title">
        <string>检测</string>
       </property>
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>30</y>
-         <width>701</width>
-         <height>31</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QTableWidget" name="videoWidget_2">
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>70</y>
+         <y>90</y>
          <width>881</width>
-         <height>211</height>
+         <height>191</height>
         </rect>
        </property>
        <attribute name="horizontalHeaderVisible">
@@ -466,6 +456,11 @@
        </attribute>
        <column>
         <property name="text">
+         <string>选择</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string>Video Files</string>
         </property>
        </column>
@@ -483,19 +478,6 @@
         <string>开始检测</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="openFileButton">
-       <property name="geometry">
-        <rect>
-         <x>770</x>
-         <y>30</y>
-         <width>141</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>open file</string>
-       </property>
-      </widget>
       <widget class="QPushButton" name="startDetectionButton_2">
        <property name="geometry">
         <rect>
@@ -509,14 +491,82 @@
         <string>人工复查</string>
        </property>
       </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>19</y>
+         <width>881</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>工区路径：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="filelineEdit"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="openFileButton">
+          <property name="text">
+           <string>open file</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>41</x>
+         <y>330</y>
+         <width>181</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLineEdit" name="processEdit">
+          <property name="text">
+           <string>检测进度：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="detectProgressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QProgressBar" name="totaldetectProgressBar">
+       <property name="geometry">
+        <rect>
+         <x>240</x>
+         <y>330</y>
+         <width>112</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_5">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>390</y>
+        <x>20</x>
+        <y>440</y>
         <width>931</width>
-        <height>161</height>
+        <height>151</height>
        </rect>
       </property>
       <property name="title">
@@ -528,74 +578,165 @@
          <x>30</x>
          <y>20</y>
          <width>881</width>
-         <height>131</height>
+         <height>121</height>
         </rect>
        </property>
       </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="page_3">
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>50</y>
-        <width>53</width>
-        <height>15</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>860</x>
-        <y>40</y>
-        <width>53</width>
-        <height>15</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_5">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>510</y>
-        <width>53</width>
-        <height>15</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>860</x>
-        <y>500</y>
-        <width>53</width>
-        <height>15</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
      <widget class="QTableWidget" name="testWidget">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>180</y>
-        <width>351</width>
-        <height>191</height>
+        <x>160</x>
+        <y>110</y>
+        <width>831</width>
+        <height>451</height>
        </rect>
       </property>
+      <column>
+       <property name="text">
+        <string>视频名称</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>桩号</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>工区负责人</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>处理状态</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>下药班长</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>下药日期</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>设计井深</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>设计药量</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>视频评价</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>是否复核</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>测量井深</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>已下药量</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>识别结果</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_6">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>0</y>
+        <width>811</width>
+        <height>91</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>条件查询</string>
+      </property>
+      <widget class="QGroupBox" name="groupBox_7">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>20</y>
+         <width>251</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>GroupBox</string>
+       </property>
+       <widget class="QSplitter" name="splitter">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>232</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>桩号</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="stationnumberlineEdit"/>
+        <widget class="QPushButton" name="stationnumberpushButton">
+         <property name="text">
+          <string>执行</string>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_8">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>151</width>
+        <height>571</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>GroupBox</string>
+      </property>
+      <widget class="QTreeWidget" name="treeWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>131</width>
+         <height>531</height>
+        </rect>
+       </property>
+       <column>
+        <property name="text">
+         <string>工区</string>
+        </property>
+       </column>
+      </widget>
      </widget>
     </widget>
    </widget>
@@ -605,7 +746,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1027</width>
+     <width>1021</width>
      <height>21</height>
     </rect>
    </property>
@@ -635,10 +776,18 @@
     <addaction name="actionWatch"/>
     <addaction name="separator"/>
    </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>设置</string>
+    </property>
+    <addaction name="action_detectors"/>
+    <addaction name="separator"/>
+   </widget>
    <addaction name="menuweishenem1"/>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
    <addaction name="menu_3"/>
+   <addaction name="menu_4"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -721,6 +870,11 @@
   <action name="action_open_workspace">
    <property name="text">
     <string>打开工区</string>
+   </property>
+  </action>
+  <action name="action_detectors">
+   <property name="text">
+    <string>检测器设置</string>
    </property>
   </action>
  </widget>

@@ -10,43 +10,52 @@
 #include<QFileDialog>
 #include<QAxObject>
 #include<QTimer>
+#include<QTreeWidget>
+#include<QTreeWidgetItem>
+#include<QCheckBox>
 #include "excelexporter.h"
 #include "excelimporter.h"
 #include "loginwidget.h"
+#include <atomic>
+
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),workspaceFileManager(new WorkspaceFileManager(this))
+    : QMainWindow(parent),workspaceFileManager(new WorkspaceFileManager(this)),detectorManager(DetectorManagerSingleton::getInstance())
     , ui(new Ui::MainWindow)
 {
-
     ui->setupUi(this);
     setWindowTitle("RockProbeMaster");
     qDebug()<<"主窗口的线程地址是："<<QThread::currentThread();
-//    QtConcurrent::run([&]() {
-//    detectorManager=new DetectorManager;
-//    detectorManager->Init(1);
-//    });
 
-//        detectorManager=new DetectorManager;
-//        detectorManager->Init(1);
+    //        QtConcurrent::run([&]() {
+    //        detectorManager.Init(2);
+    //        });
 
-    float p1 = 0, p2 = 0, p3 = 0, p4 = 0;
-//    LoginWidget *loginWidget = new LoginWidget(this);
-//    loginWidget->show();
+    //        detectorManager.Init(1);
+    //        float p2;
+    //        detectorManager.DetectAsync("F:/video/6.mp4",p2, [this](DetectLog detectlog) {
+    //            currentDetectlog = detectlog;
+    //            qDebug() <<QString::fromStdString(currentDetectlog.ToString());
+
+    //            QMetaObject::invokeMethod(this, [this, detectlog]() {
+    //                currentDetectlog = detectlog;
+    //                this->ui->resultText->setText(QString::fromStdString(currentDetectlog.ToString()));
+    //            });
+    //        });
+
+
+    //    LoginWidget *loginWidget = new LoginWidget(this);
+    //    loginWidget->show();
     //加上this 不显示的问题  setWindowFlags(Qt::Window)
-//    setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint | Qt::WindowCloseButtonHint);
+    //    setWindowFlags(this->windowFlags() | Qt::FramelessWindowHint | Qt::WindowCloseButtonHint);
     // 无法解决
-//    LoginWidget *loginWidget = new LoginWidget();
-//    loginWidget->show();
-//    initStatus();
-//    connect(loginWidget,&LoginWidget::successLogin,this,[=](){
-//        this->show();
-//    });
-//    menuBar()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    workspaceFileManager->insertVideoData("F:/test",ui->testWidget);
-    for(auto temp : workspaceFileManager->videoList){
-        qDebug()<<temp.stationNumber<<temp.workDate<<temp.worker<<temp.workspaceInfo.workspaceStationNumber<<temp.workspaceInfo.workspaceVideoPath
-                 <<temp.workspaceInfo.workspaceLeader<<temp.workspaceInfo.workspaceName;
-    }
+    //    LoginWidget *loginWidget = new LoginWidget();
+    //    loginWidget->show();
+    //    initStatus();
+    //    connect(loginWidget,&LoginWidget::successLogin,this,[=](){
+    //        this->show();
+    //    });
+    //    menuBar()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    //        setupConnections();
 
 }
 
@@ -54,6 +63,10 @@ MainWindow::~MainWindow()
 {
     delete ui;
     qDebug("调用主窗口析构函数！");
+}
+
+void MainWindow::setupConnections(){
+
 }
 
 void MainWindow::updateQTableWidget(QTableWidget *&qTableWidget)
@@ -143,6 +156,8 @@ void MainWindow::importQtable()
     excelImporter->Excel2qTableWidget(ui->detailsWidget);
 }
 
+
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     int result = QMessageBox::information(this,tr("提示"),tr("是否关闭界面!"),tr("是"), tr("否"),0,1);
@@ -165,6 +180,13 @@ void MainWindow::TimeUpdate()
     showTimeLabel->setText(strTime);
     statusBar->addPermanentWidget(showTimeLabel);
     statusBar->setSizeGripEnabled(true);
+}
+
+void MainWindow::DetectorSizeSet(int NewSize)
+{
+            QtConcurrent::run([&]() {
+            detectorManager.Init(2);
+            });
 }
 
 
@@ -353,48 +375,88 @@ void MainWindow::on_actionExit_triggered()
 void MainWindow::on_openFileButton_clicked()
 {
    QString folderPath = QFileDialog::getExistingDirectory(this, "Open Folder", QDir::homePath());
-
+   ui->filelineEdit->setText(folderPath);
    if (!folderPath.isEmpty())
    {
         QStringList nameFilters;
         nameFilters << "*.mp4";
 
         QStringList files = QDir(folderPath).entryList(nameFilters, QDir::Files);
-
-        ui->videoWidget_2->setRowCount(files.size());
-
         for (int i = 0; i < files.size(); ++i)
         {
             QString filePath = QDir(folderPath).filePath(files.at(i));
             qDebug()<<filePath<<files.at(i);
-
-            QTableWidgetItem *item = new QTableWidgetItem(files.at(i));
-            item->setToolTip(folderPath);  // Set parent folder path as toolTip
-            ui->videoWidget_2->setItem(i, 0, item);
+            this->addVideofileRow(files.at(i),filePath);
+            //            QTableWidgetItem *item = new QTableWidgetItem(files.at(i));
+            //            item->setToolTip(folderPath);  // Set parent folder path as toolTip
+            //            ui->videoWidget_2->setItem(i, 0, item);
         }
    }
-
 }
 
 
 void MainWindow::on_startDetectionButton_clicked()
 {
-   int row = ui->videoWidget_2->currentRow();
-   int column = ui->videoWidget_2->currentColumn();
-   QString fileName = ui->videoWidget_2->item(row,column)->text();
-   QString folderPath = ui->videoWidget_2->item(row,column)->toolTip();
-   QString filePath = QDir(folderPath).filePath(fileName);
+   int row_count = ui->videoWidget_2->rowCount();
+   int totalTasks = 0;
+   int completedTasks = 0;
+   QTimer *progressTimer = new QTimer(this);
+   progressTimer->setInterval(500);
+   // 连接定时器的槽函数
+   connect(progressTimer, &QTimer::timeout, this, [this]() {
+       // 直接使用 p2 引用更新进度条
+       int progressValue = static_cast<int>(p * 100);
+       ui->detectProgressBar->setValue(progressValue);
 
-    float p1=0,p2=0;
+       // 在这里可以进行其他与 p2 相关的操作
+       // 例如：this->ui->resultText->setText(QString::fromStdString(currentDetectlog.ToString()));
+   });
+   connect(progressTimer, &QTimer::timeout, this, [this, &completedTasks, totalTasks]() {
+       if (totalTasks > 0) {
+           // 计算整体进度
+           int overallProgress = static_cast<int>((completedTasks / static_cast<float>(totalTasks)) * 100);
+           ui->totaldetectProgressBar->setValue(overallProgress);
+       }
+   });
 
-        qDebug()<<"检测的线程地址是："<<QThread::currentThread();
-            std::string str = filePath.toStdString();
-        detectorManager->DetectAsync(str,p2, [](DetectLog detectlog) {
-            qDebug() <<QString::fromStdString(detectlog.ToString());
-//                this->ui->resultText->setText("为u");
-        });
+   // 在循环外部启动定时器
+   progressTimer->start();
+   ui->detectProgressBar->setRange(0, 100);  // 设置进度条范围
+   ui->detectProgressBar->setValue(0);
+   ui->totaldetectProgressBar->setRange(0, 100);  // 设置进度条范围
+   ui->totaldetectProgressBar->setValue(0);
+   for(int i=0;i<row_count;i++){
+        QCheckBox *checkBox = qobject_cast<QCheckBox*>(ui->videoWidget_2->cellWidget(i, 0));
+        if(checkBox && checkBox->isChecked()){
+            totalTasks++;
+            int row = i;
+            int column = 1;
+            QString fileName = ui->videoWidget_2->item(row,column)->text();
+            QString filePath = ui->videoWidget_2->item(row,column)->toolTip();
 
+            p=0;
+            qDebug()<<"检测的线程地址是："<<QThread::currentThread();
+                    std::string str = filePath.toStdString();
+            qDebug() <<filePath;
+            detectorManager.DetectAsync(str, p, [this, &completedTasks, totalTasks,filePath](DetectLog detectlog) {
+                currentDetectlog = detectlog;
+                qDebug() <<QString::fromStdString(currentDetectlog.ToString());
 
+                QMetaObject::invokeMethod(this, [this, &completedTasks, totalTasks,filePath]() {
+                    completedTasks++;  // 完成的任务数加一
+
+                    if (completedTasks >= totalTasks) {
+                        // 所有任务完成时停止计时器
+
+                    }
+                    QString temp = QString("视频%1:\n药柱数量为：%2,爆炸杆数量为: %3").arg(filePath).arg(currentDetectlog.GetExplosiveRodCount()).arg(currentDetectlog.GetDepthRodCount());
+//                    this->ui->resultText->setText(QString::fromStdString(currentDetectlog.ToString()));
+                    this->ui->resultText->append(temp);
+                });
+            });
+        }
+
+   }
 }
 
 
@@ -421,7 +483,6 @@ void MainWindow::on_action_create_triggered()
 {
   if(workspaceFileManager->exec()==QDialog::Accepted){
         QString tableName = workspaceFileManager->tableNameEdit->text();
-        QString stationNumber = workspaceFileManager->stationNumber->text();
         QString leader = workspaceFileManager->leader->text();
         QString videoPath=workspaceFileManager->videoPath->text();
         QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
@@ -432,17 +493,40 @@ void MainWindow::on_action_create_triggered()
         db.setDatabaseName("mydata");
 
         if(db.open()){
-            QSqlQuery query;
-            query.exec("CREATE TABLE "+tableName+"(id INT PRIMARY KEY)");
-            QMessageBox::information(this, "Table Created", "New table created successfully!");
-            WorkspaceInfo workspaceInfo(tableName,stationNumber,leader,videoPath);
+        QString createTableQuery = "CREATE TABLE " + tableName + " ("
+                           "station_number INT PRIMARY KEY,"
+                           "video_name TEXT,"
+                           "workspace_leader TEXT,"
+                           "processing_status TEXT,"
+                           "explosive_supervisor TEXT,"
+                           "explosive_date TEXT,"
+                           "design_depth TEXT,"
+                           "design_explosive_quantity TEXT,"
+                           "video_evaluation TEXT,"
+                           "review_status TEXT,"
+                           "measured_depth TEXT,"
+                           "explosive_amount_deployed TEXT,"
+                           "identification_result TEXT)";
+
+        QSqlQuery query;
+
+        if (query.exec(createTableQuery)) {
+        QMessageBox::information(this, "表创建成功", "新表成功创建！");
+        } else {
+        QMessageBox::warning(this, "表创建失败", "无法创建表: " + query.lastError().text());
+        }
+
+            WorkspaceInfo workspaceInfo(tableName,leader,videoPath);
+            currentWorkspace=workspaceInfo;
+            workspaceFileManager->insertVideoData("F:/test",workspaceInfo,ui->testWidget);
             workspaceFileManager->saveWorkspaceInfoTOJson(workspaceInfo);
+            workspaceFileManager->insertDataIntoTable(workspaceFileManager->videoList,workspaceInfo);
             db.close();
         } else {
             QMessageBox::warning(this, "Database Error", "Failed to open the database!");
         }
         workspaceFileManager->tableNameEdit->clear();
-        workspaceFileManager->stationNumber->clear();
+
   }
 }
 
@@ -460,6 +544,107 @@ void MainWindow::on_action_open_workspace_triggered()
 void MainWindow::openWorkspaceTable(WorkspaceInfo workspace)
 {
   QMessageBox::warning(this,"提示","打开成功");
-  qDebug()<<workspace.workspaceName<<workspace.workspaceStationNumber;
+  QString sql=("select station_number,"
+                    "video_name,"
+                    "workspace_leader,"
+                    "processing_status,"
+                    "explosive_supervisor,"
+                    "explosive_date,"
+                    "design_depth,"
+                    "design_explosive_quantity,"
+                    "video_evaluation,"
+                    "review_status,"
+                    "measured_depth,"
+                    "explosive_amount_deployed,"
+                    "identification_result from "+workspace.workspaceName);
+  this->loadTableToWidget(workspace.workspaceName,sql,ui->testWidget);
+  workspaceOpener->close();
+
+  QTreeWidgetItem *workspaceItem = new QTreeWidgetItem(ui->treeWidget);
+  workspaceItem->setText(0,workspace.workspaceName);
+}
+
+void MainWindow::loadTableToWidget(QString tableName,QString sqlstr, QTableWidget *qTableWidget)
+{
+
+  QSqlQuery query,query2;
+  query.prepare(sqlstr);
+  int rowCnt = 0 , column = 0;
+  if(query2.exec(sqlstr)){
+      rowCnt=query2.size();
+  }
+  else qDebug() << "Query failed: " << query2.lastError().text();
+
+  column=qTableWidget->columnCount();
+
+  if(rowCnt > 0){
+        if(query.exec()){
+        for(int i=0;i<rowCnt;i++){
+            query.next();
+            for(int j=0;j<column;j++){
+        qTableWidget->setRowCount(i+1);
+        qTableWidget->setItem(i,j,new QTableWidgetItem(query.value(j).toString()));
+        qTableWidget->item(i,j)->setTextAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
+            }
+        }
+       }
+        else qDebug() << "Query failed: " << query.lastError().text();
+  }
+  else {
+        QMessageBox::warning(this,"警告","查询表的内容为空");
+  }
+  qTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  qTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+  qTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  qTableWidget->setAlternatingRowColors(true);
+}
+
+
+void MainWindow::on_stationnumberpushButton_clicked()
+{
+  QString sql=("SELECT station_number,"
+                 "video_name,"
+                 "workspace_leader,"
+                 "processing_status,"
+                 "explosive_supervisor,"
+                 "explosive_date,"
+                 "design_depth,"
+                 "design_explosive_quantity,"
+                 "video_evaluation,"
+                 "review_status,"
+                 "measured_depth,"
+                 "explosive_amount_deployed,"
+                 "identification_result FROM 表uu WHERE station_number = 1");
+  qDebug()<<currentWorkspace.workspaceName;
+
+  ui->testWidget->clearContents();
+  this->loadTableToWidget(currentWorkspace.workspaceName,sql,ui->testWidget);
+}
+
+
+void MainWindow::on_action_detectors_triggered()
+{
+  detectorSizeSettings = new DetectorSizeSettings();
+  detectorSizeSettings->show();/*
+  connect(detectorSizeSettings,&DetectorSizeSettings::detectSizeChanged,this,&MainWindow::DetectorSizeSet);*/
+  connect(detectorSizeSettings, &DetectorSizeSettings::detectSizeChanged, this, [this](int newSize) {
+      // 启动线程来执行 detectorManager.Init
+      QFuture<void> future = QtConcurrent::run([this, newSize]() {
+          detectorManager.Init(newSize);
+
+          // 在主线程中更新 UI
+          QMetaObject::invokeMethod(this, [this]() {
+              // 这里可以在主线程中执行任何 UI 更新操作
+          });
+      });
+
+      // 等待线程完成
+      future.waitForFinished();
+  });
+}
+
+void MainWindow::updateProgressBar(int progress)
+{
+
 }
 

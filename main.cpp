@@ -17,6 +17,7 @@
 #include <QtConcurrent/QtConcurrentRun>
 #include "detectormanagersingleton.h"
 #include "videoreviewwidget.h"
+#include "detectorsizesettings.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -32,12 +33,14 @@ int main(int argc, char *argv[])
                 //    foreach(QString driver, drivers)
                 //        qDebug()<<driver;
 
-//    DatabaseConnector databaseConnector;
+    DatabaseConnector databaseConnector;
 
-//    DetectorManager& detectorManager = DetectorManagerSingleton::getInstance();
-//    detectorManager.Init(1);
+
     MainWindow w;
     w.show();
+
+//    DetectorSizeSettings d;
+//    d.show();
 
 
     // 在这里添加你的初始化代码，例如加载资源、配置等

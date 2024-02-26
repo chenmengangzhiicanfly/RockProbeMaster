@@ -19,6 +19,8 @@
 #include <QMediaPlayer>
 #include "workspacefilemanager.h"
 #include "workspaceopener.h"
+#include "detectormanagersingleton.h"
+#include "detectorsizesettings.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -37,32 +39,42 @@ public:
     bool databaseIsEmpty(QTableWidget* qTableWidget,int row);
 
 signals:
-   void goBack();
+    void goBack();
+    void detectAchieved();
+    void tableOpened();
 private:
     Ui::MainWindow *ui;
     QStatusBar *statusBar;
 
     QLabel *showTimeLabel;
 private:
+    DetectLog currentDetectlog;
+
     void init();
     void initMenu();
     void initStatus();
 
     void exportQtable();
     void importQtable();
-
+    void addVideofileRow(const QString &fileName,const QString &filePath);
+    void setupConnections();
 
     void closeEvent(QCloseEvent *event) override;
     QAction *actionexcelFile;
     ExcelReaderAndDisplayer * excelReaderAndDisplayer;
     DatabaseInsertPage *databaseInsertPage;
 
-    DetectorManager *detectorManager;
+    DetectorManager &detectorManager;
     QMediaPlayer *mediaPlayer;
     WorkspaceFileManager *workspaceFileManager;
     WorkspaceOpener *workspaceOpener;
+    WorkspaceInfo currentWorkspace;
+    DetectorSizeSettings *detectorSizeSettings;
+
+    float p;
 private slots:
     void TimeUpdate();
+    void DetectorSizeSet(int NewSize);
     void on_loadButton_clicked();
     void on_addButton_clicked();
     void on_deleteButton_clicked();
@@ -82,5 +94,10 @@ private slots:
     void on_startDetectionButton_2_clicked();
     void on_action_open_workspace_triggered();
     void openWorkspaceTable(WorkspaceInfo workspace);
+    void loadTableToWidget(QString tableName,QString sqlstr,QTableWidget *qTableWidget);
+    void on_stationnumberpushButton_clicked();
+    void on_action_detectors_triggered();
+    void updateProgressBar(int progress);
+
 };
 #endif // MAINWINDOW_H

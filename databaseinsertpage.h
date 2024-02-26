@@ -5,6 +5,7 @@
 #include <QString>
 #include <QSqlQuery>
 #include <QSqlError>
+
 namespace Ui {
 class DatabaseInsertPage;
 }

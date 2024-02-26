@@ -8,17 +8,25 @@
 #include <QTableWidgetItem>
 struct WorkspaceInfo{
     QString workspaceName;
-    QString workspaceStationNumber;
     QString workspaceLeader;
     QString workspaceVideoPath;
-    WorkspaceInfo(QString tableName,QString leader,QString videoPath,QString id):workspaceName(tableName),workspaceLeader(leader),workspaceVideoPath(videoPath),
-        workspaceStationNumber(id){}
+    WorkspaceInfo(QString tableName,QString leader,QString videoPath):workspaceName(tableName),workspaceLeader(leader),workspaceVideoPath(videoPath)
+    {}
     WorkspaceInfo(){}
 };
 struct VideoInfo{
     QString stationNumber;
     QString worker;
     QString workDate;
+    QString videoName;
+    QString processing_status;
+    QString design_depth;
+    QString design_explosive_quantity;
+    QString video_evaluation;
+    QString review_status;
+    QString measured_depth;
+    QString explosive_amount_deployed;
+    QString identification_result;
     struct WorkspaceInfo workspaceInfo;
 };
 
@@ -33,13 +41,13 @@ class WorkspaceFileManager : public QDialog
 public:
     explicit WorkspaceFileManager(QWidget *parent = nullptr);
     ~WorkspaceFileManager();
+
     QLineEdit *tableNameEdit;
-    QLineEdit *stationNumber;
     QLineEdit *leader;
     QLineEdit *videoPath;
     void saveWorkspaceInfoTOJson(const WorkspaceInfo &workspaceInfo);
-    void insertVideoData(const QString& folderPath,QTableWidget* tableWidget);
-
+    void insertVideoData(const QString& folderPath,WorkspaceInfo &workspace,QTableWidget* tableWidget);
+    void insertDataIntoTable(QVector<VideoInfo> &videoLists,WorkspaceInfo workspace);
     QVector<VideoInfo> videoList;
 private:
     Ui::WorkspaceFileManager *ui;

@@ -6,8 +6,8 @@ WorkspaceOpener::WorkspaceOpener(QWidget *parent) :
     ui(new Ui::WorkspaceOpener)
 {
     ui->setupUi(this);
-    tableWidget->setColumnCount(2);
-    tableWidget->setHorizontalHeaderLabels({"Workspace Name","Station Number"});
+    tableWidget->setColumnCount(3);
+    tableWidget->setHorizontalHeaderLabels({"工区名称","工区负责人","工区路径"});
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(tableWidget);
     setWindowTitle("打开工区");
@@ -25,9 +25,11 @@ void WorkspaceOpener::addWorkspaceInfo(const WorkspaceInfo &workspaceInfo)
     int row =tableWidget->rowCount();
     tableWidget->insertRow(row);
     QTableWidgetItem *nameItem = new QTableWidgetItem(workspaceInfo.workspaceName);
-    QTableWidgetItem *stationItem = new QTableWidgetItem(workspaceInfo.workspaceStationNumber);
+    QTableWidgetItem *headerItem = new QTableWidgetItem(workspaceInfo.workspaceLeader);
+    QTableWidgetItem *pathItem = new QTableWidgetItem(workspaceInfo.workspaceVideoPath);
     tableWidget->setItem(row,0,nameItem);
-    tableWidget->setItem(row,1,stationItem);
+    tableWidget->setItem(row,1,headerItem);
+    tableWidget->setItem(row,2,pathItem);
     workspaces.append(workspaceInfo);
 }
 
@@ -49,10 +51,8 @@ bool WorkspaceOpener::loadWorkspacesFromJson()
                     WorkspaceInfo workspace;
                     QJsonObject obj = array.at(i).toObject();
                     workspace.workspaceName = obj.value("workspaceName").toString();
-                    workspace.workspaceStationNumber = obj.value("workspaceStationNumber").toString();
                     workspace.workspaceLeader = obj.value("workspaceLeader").toString();
                     workspace.workspaceVideoPath = obj.value("workspaceVideoPath").toString();
-
                     addWorkspaceInfo(workspace);
                 }
             }
@@ -102,4 +102,3 @@ void WorkspaceOpener::onTableItemDoubleClicked()
     }
     emit onTableItemDoubleClickedtoMain(workspace);
 }
-

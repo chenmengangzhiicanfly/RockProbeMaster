@@ -22,5 +22,5 @@ DatabaseConnector::DatabaseConnector()
 
 DatabaseConnector::~DatabaseConnector()
 {
-     qDebug("数据库推出连接！");
+     qDebug("数据库退出连接！");
 }
