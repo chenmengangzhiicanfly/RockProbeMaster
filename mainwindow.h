@@ -49,6 +49,7 @@ private:
     QLabel *showTimeLabel;
 private:
     DetectLog currentDetectlog;
+    QSqlDatabase db;
 
     void init();
     void initMenu();
@@ -93,7 +94,7 @@ private slots:
     void on_action_D_triggered();
     void on_startDetectionButton_2_clicked();
     void on_action_open_workspace_triggered();
-    void openWorkspaceTable(WorkspaceInfo workspace);
+    void openWorkspaceTable(QString table);
     void loadTableToWidget(QString tableName,QString sqlstr,QTableWidget *qTableWidget);
     void on_stationnumberpushButton_clicked();
     void on_action_detectors_triggered();

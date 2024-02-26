@@ -6,7 +6,6 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include "loginwidget.h"
-#include "databaseconnector.h"
 #include "excelreaderanddisplayer.h"
 #include "excelexporter.h"
 #include "DetectLog.h"
@@ -32,9 +31,6 @@ int main(int argc, char *argv[])
                 //    QStringList drivers = QSqlDatabase::drivers();
                 //    foreach(QString driver, drivers)
                 //        qDebug()<<driver;
-
-    DatabaseConnector databaseConnector;
-
 
     MainWindow w;
     w.show();

@@ -14,20 +14,27 @@ struct WorkspaceInfo{
     {}
     WorkspaceInfo(){}
 };
+
+
 struct VideoInfo{
-    QString stationNumber;
-    QString worker;
-    QString workDate;
-    QString videoName;
-    QString processing_status;
-    QString design_depth;
-    QString design_explosive_quantity;
-    QString video_evaluation;
-    QString review_status;
-    QString measured_depth;
-    QString explosive_amount_deployed;
-    QString identification_result;
-    struct WorkspaceInfo workspaceInfo;
+   QString stationNumber;
+   QString videoName;
+   QString designDrillingDepth;
+   QString designInitiationDepth;
+   QString singleWellExplosiveAmount;
+   QString quantityOfDetonatorsPerWell;
+   QString numberOfWells;
+   QString depthOfCharging;
+   QString difference;
+   QString wellSupervisor;
+   QString inspector;
+   QString chargingDate;
+   QString inspectionDate;
+   QString drillingEvaluation;
+   QString remarks;
+   QString videoPath;
+
+   struct WorkspaceInfo workspaceInfo;
 };
 
 namespace Ui {
@@ -48,10 +55,11 @@ public:
     void saveWorkspaceInfoTOJson(const WorkspaceInfo &workspaceInfo);
     void insertVideoData(const QString& folderPath,WorkspaceInfo &workspace,QTableWidget* tableWidget);
     void insertDataIntoTable(QVector<VideoInfo> &videoLists,WorkspaceInfo workspace);
+    void createTableInDatabase(const QString& tableName);
+    void createOrInsertMasterTable(WorkspaceInfo workspaceinfo);
     QVector<VideoInfo> videoList;
 private:
     Ui::WorkspaceFileManager *ui;
-
 
 private slots:
     void createTable();

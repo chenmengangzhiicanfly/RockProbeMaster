@@ -10,6 +10,7 @@
 #include <QJsonArray>
 #include <QSqlQuery>
 #include <QSqlError>
+#include<QMessageBox>
 WorkspaceFileManager::WorkspaceFileManager(QWidget *parent) :
     QDialog(parent),tableNameEdit(new QLineEdit(this)),leader(new QLineEdit(this)),videoPath(new QLineEdit(this)),
     ui(new Ui::WorkspaceFileManager)
@@ -106,7 +107,7 @@ void WorkspaceFileManager::insertVideoData(const QString &folderPath,WorkspaceIn
 
     QStringList header;
     tableWidget->setColumnCount(3);
-    header <<"日期"<<"人名"<<"视频名";
+    header <<"日期"<<"井监"<<"视频名";
     tableWidget->setHorizontalHeaderLabels(header);
     QDir dir(folderPath);
     if(!dir.exists()){
@@ -119,34 +120,34 @@ void WorkspaceFileManager::insertVideoData(const QString &folderPath,WorkspaceIn
         QDir workerFolderDir(workerFolderPath);
         QStringList workerFolders =workerFolderDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
         for(const QString& workerFolder : workerFolders){
-        // 获取文件夹下所有视频文件
+            // 获取文件夹下所有视频文件
             QString videoFolderPath = workerFolderDir.filePath(workerFolder);
             QDir videoFolderDir(videoFolderPath);
             QStringList videos = videoFolderDir.entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mov", QDir::Files);
-        for(const QString& video :videos){
+            for(const QString& video :videos){
 
-            QFileInfo fileInfo(video);
-            QString videoname = fileInfo.completeBaseName();
-            int row = tableWidget->rowCount();
-            tableWidget->insertRow(row);
-            QTableWidgetItem* videoItem = new QTableWidgetItem(video);
-            QTableWidgetItem* workerItem = new QTableWidgetItem(workerFolder);
-            QTableWidgetItem* dateItem = new QTableWidgetItem(dateFolder);
-            tableWidget->setItem(row, 2, videoItem);
-            tableWidget->setItem(row, 1, workerItem);
-            tableWidget->setItem(row, 0, dateItem);
-
-            VideoInfo videoData;
-            videoData.stationNumber =videoname;
-            videoData.worker = workerFolder;
-            videoData.workDate = dateFolder;
-            videoData.processing_status="未处理";
-            videoData.workspaceInfo.workspaceLeader =workspace.workspaceLeader;
-            videoData.workspaceInfo.workspaceVideoPath=workspace.workspaceVideoPath;
-            videoData.workspaceInfo.workspaceName=workspace.workspaceName;
-
-            videoList.append(videoData);
-        }
+                QFileInfo fileInfo(video);
+                QString videoname = fileInfo.completeBaseName();
+                int row = tableWidget->rowCount();
+                tableWidget->insertRow(row);
+                QTableWidgetItem* videoItem = new QTableWidgetItem(video);
+                QTableWidgetItem* workerItem = new QTableWidgetItem(workerFolder);
+                QTableWidgetItem* dateItem = new QTableWidgetItem(dateFolder);
+                tableWidget->setItem(row, 2, videoItem);
+                tableWidget->setItem(row, 1, workerItem);
+                tableWidget->setItem(row, 0, dateItem);
+                VideoInfo videoData;
+                videoData.stationNumber = videoname;
+                videoData.videoName = video;
+                videoData.inspector = workspace.workspaceLeader;
+                videoData.designDrillingDepth = QString("10.0");
+                videoData.designInitiationDepth = QString("8.0");
+                videoData.numberOfWells = QString("1");
+                videoData.singleWellExplosiveAmount= QString("8");
+                videoData.quantityOfDetonatorsPerWell= QString("2");
+                videoData.videoPath = fileInfo.absoluteFilePath();
+                videoList.append(videoData);
+            }
         }
     }
 }
@@ -154,37 +155,93 @@ void WorkspaceFileManager::insertVideoData(const QString &folderPath,WorkspaceIn
 void WorkspaceFileManager::insertDataIntoTable(QVector<VideoInfo> &videoLists, WorkspaceInfo workspace)
 {
     QSqlQuery query;
+    qDebug()<<videoLists.size();
     for(auto video : videoLists){
-    query.prepare("INSERT INTO "+workspace.workspaceName+
-                  "(station_number, video_name, workspace_leader, processing_status, explosive_supervisor, explosive_date, "
-                  "design_depth, design_explosive_quantity, video_evaluation, review_status, measured_depth, "
-                  "explosive_amount_deployed, identification_result) "
-                  "VALUES "
-                  "(:stationnumber, :videoName, :workspaceLeader, :processingStatus, :explosiveSupervisor, :explosiveDate, "
-                  ":designDepth, :designExplosiveQuantity, :videoEvaluation, :reviewStatus, :measuredDepth, "
-                  ":explosiveAmountDeployed, :identificationResult)");
+        query.prepare("INSERT INTO "+workspace.workspaceName+
+                      "(stationNumber, videoName, designDrillingDepth, designInitiationDepth, singleWellExplosiveAmount, quantityOfDetonatorsPerWell, "
+                      "numberOfWells, depthOfCharging, difference, wellSupervisor, inspector, "
+                      "chargingDate, inspectionDate, drillingEvaluation, remarks, videoPath) "
+                      "VALUES "
+                      "(:stationNumber, :videoName, :designDrillingDepth, :designInitiationDepth, :singleWellExplosiveAmount, :quantityOfDetonatorsPerWell, "
+                      ":numberOfWells, :depthOfCharging, :difference, :wellSupervisor, :inspector, "
+                      ":chargingDate, :inspectionDate, :drillingEvaluation, :remarks, :videoPath)");
 
 
-    query.bindValue(":stationnumber", video.stationNumber.toInt());
-    query.bindValue(":videoName",video.videoName);
-    query.bindValue(":workspaceLeader",video.workspaceInfo.workspaceLeader);
-    query.bindValue(":processingStatus", video.processing_status);
-    query.bindValue(":explosiveSupervisor", video.worker);
-    query.bindValue(":explosiveDate", video.workDate);
-    query.bindValue(":designDepth", video.design_depth);
-    query.bindValue(":designExplosiveQuantity", video.design_explosive_quantity);
-    query.bindValue(":videoEvaluation", video.video_evaluation);
-    query.bindValue(":reviewStatus", video.review_status);
-    query.bindValue(":measuredDepth", video.measured_depth);
-    query.bindValue(":explosiveAmountDeployed", video.explosive_amount_deployed);
-    query.bindValue(":identificationResult", video.identification_result);
-    if (query.exec()) {
-        qDebug() << "数据插入成功";
+        query.bindValue(":stationNumber", video.stationNumber.toInt());
+        query.bindValue(":videoName",video.videoName);
+        query.bindValue(":designDrillingDepth",video.designDrillingDepth);
+        query.bindValue(":designInitiationDepth", video.designInitiationDepth);
+        query.bindValue(":singleWellExplosiveAmount", video.singleWellExplosiveAmount);
+        query.bindValue(":quantityOfDetonatorsPerWell", video.quantityOfDetonatorsPerWell);
+        query.bindValue(":numberOfWells", video.numberOfWells);
+        query.bindValue(":depthOfCharging", video.depthOfCharging);
+        query.bindValue(":difference", video.difference);
+        query.bindValue(":wellSupervisor", video.wellSupervisor);
+        query.bindValue(":inspector", video.inspector);
+        query.bindValue(":chargingDate", video.chargingDate);
+        query.bindValue(":inspectionDate", video.inspectionDate);
+        query.bindValue(":drillingEvaluation", video.drillingEvaluation);
+        query.bindValue(":remarks", video.remarks);
+        query.bindValue(":videoPath", video.videoPath);
 
-    } else {
-        qDebug() << "数据插入失败: " << query.lastError().text();
+        if (query.exec()) {
+            qDebug() << "数据插入成功";
+
+        } else {
+            qDebug() << "数据插入失败: " << query.lastError().text();
+        }
     }
-  }
+}
+
+void WorkspaceFileManager::createTableInDatabase(const QString &tableName)
+{
+ QString createTableQuery = "CREATE TABLE " + tableName + " ("
+                                   "stationNumber INT PRIMARY KEY,"
+                                   "videoName TEXT,"
+                                   "designDrillingDepth TEXT,"
+                                   "designInitiationDepth TEXT,"
+                                   "singleWellExplosiveAmount TEXT,"
+                                   "quantityOfDetonatorsPerWell TEXT,"
+                                   "numberOfWells TEXT,"
+                                   "depthOfCharging TEXT,"
+                                   "difference TEXT,"
+                                   "wellSupervisor TEXT,"
+                                   "inspector TEXT,"
+                                   "chargingDate TEXT,"
+                                   "inspectionDate TEXT,"
+                                   "drillingEvaluation TEXT,"
+                                   "remarks TEXT,"
+                                   "videoPath TEXT)";
+
+        QSqlQuery query;
+
+        if (query.exec(createTableQuery)) {
+            QMessageBox::information(nullptr, "表创建成功", "新表成功创建！");
+        } else {
+            QMessageBox::warning(nullptr, "表创建失败", "无法创建表: " + query.lastError().text());
+        }
+}
+
+void WorkspaceFileManager::createOrInsertMasterTable(WorkspaceInfo workspaceinfo)
+{
+    QString createTableQuery = "CREATE TABLE IF NOT EXISTS TableList ("
+                                           "workspaceName VARCHAR(255) NOT NULL PRIMARY KEY,"
+                                           "workspaceLeader TEXT,"
+                                           "workspaceVideoPath TEXT)";
+    QSqlQuery query;
+    if (!query.exec(createTableQuery)) {
+        QMessageBox::warning(nullptr, "表创建失败", "无法创建表: " + query.lastError().text());
+        return;
+    }
+    QByteArray workspaceNameBytes = workspaceinfo.workspaceName.toUtf8();
+    const char *workspaceNameChar = workspaceNameBytes.constData();
+    QString insertQuery = QString("INSERT INTO TableList (workspaceName,workspaceLeader,workspaceVideoPath) VALUES ('%1','%2','%3')").arg(workspaceinfo.workspaceName)
+                                                                                                                                     .arg(workspaceinfo.workspaceLeader)
+                                                                                                                                     .arg(workspaceinfo.workspaceVideoPath);
+        if (!query.exec(insertQuery)) {
+            QMessageBox::warning(nullptr, "插入数据失败", "无法插入数据: " + query.lastError().text());
+            return;
+        }
 }
 
 void WorkspaceFileManager::createTable()

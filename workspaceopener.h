@@ -13,6 +13,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include "workspacefilemanager.h"
+
+#define TABLE_COLUMN 3;
 namespace Ui {
 class WorkspaceOpener;
 }
@@ -26,17 +28,17 @@ public:
     ~WorkspaceOpener();
     void addWorkspaceInfo(const WorkspaceInfo &workspaceInfo);
     bool loadWorkspacesFromJson();
+    bool loadWorkspaceInfoFromDatabase();
 
 private:
     Ui::WorkspaceOpener *ui;
     QTableWidget *tableWidget;
     QVector<WorkspaceInfo> workspaces;
-
     void setupConnections();
 public slots:
     void onTableItemDoubleClicked();
 signals:
-    void onTableItemDoubleClickedtoMain(WorkspaceInfo workspace);
+    void onTableItemDoubleClickedtoMain(QString table);
 };
 
 #endif // WORKSPACEOPENER_H

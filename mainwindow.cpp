@@ -13,6 +13,7 @@
 #include<QTreeWidget>
 #include<QTreeWidgetItem>
 #include<QCheckBox>
+#include "databaseconnector.h"
 #include "excelexporter.h"
 #include "excelimporter.h"
 #include "loginwidget.h"
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("RockProbeMaster");
     qDebug()<<"主窗口的线程地址是："<<QThread::currentThread();
+    DatabaseConnector::connectDatabase(db);
 
     //        QtConcurrent::run([&]() {
     //        detectorManager.Init(2);
@@ -478,50 +480,28 @@ void MainWindow::on_startDetectionButton_2_clicked()
   mediaPlayer->play();
 }
 
-
+// 创建工区
 void MainWindow::on_action_create_triggered()
 {
   if(workspaceFileManager->exec()==QDialog::Accepted){
         QString tableName = workspaceFileManager->tableNameEdit->text();
         QString leader = workspaceFileManager->leader->text();
         QString videoPath=workspaceFileManager->videoPath->text();
-        QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-        db.setHostName("localhost");
-        db.setPort(3306);
-        db.setUserName("root");
-        db.setPassword("123456");
-        db.setDatabaseName("mydata");
 
         if(db.open()){
-        QString createTableQuery = "CREATE TABLE " + tableName + " ("
-                           "station_number INT PRIMARY KEY,"
-                           "video_name TEXT,"
-                           "workspace_leader TEXT,"
-                           "processing_status TEXT,"
-                           "explosive_supervisor TEXT,"
-                           "explosive_date TEXT,"
-                           "design_depth TEXT,"
-                           "design_explosive_quantity TEXT,"
-                           "video_evaluation TEXT,"
-                           "review_status TEXT,"
-                           "measured_depth TEXT,"
-                           "explosive_amount_deployed TEXT,"
-                           "identification_result TEXT)";
-
-        QSqlQuery query;
-
-        if (query.exec(createTableQuery)) {
-        QMessageBox::information(this, "表创建成功", "新表成功创建！");
-        } else {
-        QMessageBox::warning(this, "表创建失败", "无法创建表: " + query.lastError().text());
-        }
-
             WorkspaceInfo workspaceInfo(tableName,leader,videoPath);
             currentWorkspace=workspaceInfo;
-            workspaceFileManager->insertVideoData("F:/test",workspaceInfo,ui->testWidget);
+            QTableWidget *videoshow = new QTableWidget();
+//            workspaceFileManager->insertVideoData("F:/test",workspaceInfo,videoshow);
+            workspaceFileManager->insertVideoData(videoPath,workspaceInfo,videoshow);
             workspaceFileManager->saveWorkspaceInfoTOJson(workspaceInfo);
-            workspaceFileManager->insertDataIntoTable(workspaceFileManager->videoList,workspaceInfo);
-            db.close();
+            workspaceFileManager->createOrInsertMasterTable(currentWorkspace);   //将该表进行登记,汇总在大表中
+            workspaceFileManager->createTableInDatabase(tableName);   //建造工区- 建表
+
+           workspaceFileManager->insertDataIntoTable(workspaceFileManager->videoList,workspaceInfo);
+
+            videoshow->setWindowTitle("视频信息");
+            videoshow->show();
         } else {
             QMessageBox::warning(this, "Database Error", "Failed to open the database!");
         }
@@ -531,17 +511,21 @@ void MainWindow::on_action_create_triggered()
 }
 
 
-
 void MainWindow::on_action_open_workspace_triggered()
 {
   workspaceOpener = new WorkspaceOpener(this);
-  if(workspaceOpener->loadWorkspacesFromJson())
+  //  if(workspaceOpener->loadWorkspacesFromJson())
+  //        workspaceOpener->show();
+  //  else QMessageBox::critical(this,"错误","文件没有打开");
+  if(workspaceOpener->loadWorkspaceInfoFromDatabase()){
+        qDebug()<<"加载数据表";
         workspaceOpener->show();
-  else QMessageBox::critical(this,"错误","文件没有打开");
+  }
+  else QMessageBox::critical(this,"错误","数据库表没有打开");
   connect(workspaceOpener,&WorkspaceOpener::onTableItemDoubleClickedtoMain,this,&MainWindow::openWorkspaceTable);
 }
 
-void MainWindow::openWorkspaceTable(WorkspaceInfo workspace)
+void MainWindow::openWorkspaceTable(QString table)
 {
   QMessageBox::warning(this,"提示","打开成功");
   QString sql=("select station_number,"
@@ -556,8 +540,8 @@ void MainWindow::openWorkspaceTable(WorkspaceInfo workspace)
                     "review_status,"
                     "measured_depth,"
                     "explosive_amount_deployed,"
-                    "identification_result from "+workspace.workspaceName);
-  this->loadTableToWidget(workspace.workspaceName,sql,ui->testWidget);
+                    "identification_result from "+table);
+  this->loadTableToWidget(table,sql,ui->testWidget);  //修改到这里
   workspaceOpener->close();
 
   QTreeWidgetItem *workspaceItem = new QTreeWidgetItem(ui->treeWidget);
@@ -566,12 +550,11 @@ void MainWindow::openWorkspaceTable(WorkspaceInfo workspace)
 
 void MainWindow::loadTableToWidget(QString tableName,QString sqlstr, QTableWidget *qTableWidget)
 {
-
   QSqlQuery query,query2;
   query.prepare(sqlstr);
   int rowCnt = 0 , column = 0;
   if(query2.exec(sqlstr)){
-      rowCnt=query2.size();
+   rowCnt=query2.size();
   }
   else qDebug() << "Query failed: " << query2.lastError().text();
 
@@ -614,7 +597,7 @@ void MainWindow::on_stationnumberpushButton_clicked()
                  "review_status,"
                  "measured_depth,"
                  "explosive_amount_deployed,"
-                 "identification_result FROM 表uu WHERE station_number = 1");
+                 "identification_result FROM 表uu WHERE  station_number = 1");
   qDebug()<<currentWorkspace.workspaceName;
 
   ui->testWidget->clearContents();

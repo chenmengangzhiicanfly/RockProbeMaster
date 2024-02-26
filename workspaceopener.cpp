@@ -1,6 +1,9 @@
 #include "workspaceopener.h"
 #include "ui_workspaceopener.h"
 #include <QMessageBox>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QTableWidgetItem>
 WorkspaceOpener::WorkspaceOpener(QWidget *parent) :
     QDialog(parent),tableWidget(new QTableWidget(this)),
     ui(new Ui::WorkspaceOpener)
@@ -56,7 +59,6 @@ bool WorkspaceOpener::loadWorkspacesFromJson()
                     addWorkspaceInfo(workspace);
                 }
             }
-
             //            if (jsonDoc.isObject()) { // JSON 文档为对象
             //                QJsonObject object = jsonDoc.object();  // 转化为对象
             //                if (object.contains("workspaceName")) {  // 包含指定的 key
@@ -85,20 +87,46 @@ bool WorkspaceOpener::loadWorkspacesFromJson()
     return true;
 }
 
+bool WorkspaceOpener::loadWorkspaceInfoFromDatabase()
+{
+    QSqlQuery query;
+    if (!query.exec("SELECT * FROM tablelist")) {
+        qDebug() << "Failed to execute query:" << query.lastError().text();
+        return false;
+    }
+    tableWidget->clear();
+    tableWidget->setRowCount(0);
+
+    while(query.next()){
+        int row = tableWidget->rowCount();
+        tableWidget->insertRow(row);
+        for(int column=0;column< tableWidget->columnCount() ;++column){
+
+            QTableWidgetItem *item = new QTableWidgetItem(query.value(column).toString());
+            tableWidget->setItem(row,column,item);
+        }
+    }
+    return true;
+}
+
 void WorkspaceOpener::setupConnections()
 {
     connect(tableWidget,&QTableWidget::itemDoubleClicked,this,&WorkspaceOpener::onTableItemDoubleClicked);
 }
-
 void WorkspaceOpener::onTableItemDoubleClicked()
 {
     QString temp_workspace =tableWidget->item(tableWidget->currentRow(),0)->text();
-    WorkspaceInfo workspace;
-    for(auto temp : workspaces){
-        if(temp_workspace==temp.workspaceName){
-            workspace=temp;
-            break;
-        }
-    }
-    emit onTableItemDoubleClickedtoMain(workspace);
+    emit onTableItemDoubleClickedtoMain(temp_workspace);
 }
+//void WorkspaceOpener::onTableItemDoubleClicked()
+//{
+//    QString temp_workspace =tableWidget->item(tableWidget->currentRow(),0)->text();
+//    WorkspaceInfo workspace;
+//    for(auto temp : workspaces){
+//        if(temp_workspace==temp.workspaceName){
+//            workspace=temp;
+//            break;
+//        }
+//    }
+//    emit onTableItemDoubleClickedtoMain(workspace);
+//}
