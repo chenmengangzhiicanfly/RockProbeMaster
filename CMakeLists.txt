@@ -89,7 +89,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         detectormanagersingleton.h detectormanagersingleton.cpp videoreviewslots.cpp
         workspacefilemanager.h workspacefilemanager.cpp workspacefilemanager.ui
         workspaceopener.h workspaceopener.cpp workspaceopener.ui
-        mainwindowonlydetect.cpp
+        mainwindowonlydetect.cpp mainwindowmainpage.cpp
         detectorsizesettings.h detectorsizesettings.cpp detectorsizesettings.ui
     )
 # Define target properties for Android with Qt 6 as:

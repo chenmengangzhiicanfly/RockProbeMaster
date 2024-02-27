@@ -145,13 +145,13 @@ void WorkspaceFileManager::insertVideoData(const QString &folderPath,WorkspaceIn
                 videoData.numberOfWells = QString("1");
                 videoData.singleWellExplosiveAmount= QString("8");
                 videoData.quantityOfDetonatorsPerWell= QString("2");
-                videoData.videoPath = fileInfo.absoluteFilePath();
+
+                videoData.videoPath = videoFolderDir.absoluteFilePath(video);
                 videoList.append(videoData);
             }
         }
     }
 }
-
 void WorkspaceFileManager::insertDataIntoTable(QVector<VideoInfo> &videoLists, WorkspaceInfo workspace)
 {
     QSqlQuery query;
@@ -212,6 +212,7 @@ void WorkspaceFileManager::createTableInDatabase(const QString &tableName)
                                    "drillingEvaluation TEXT,"
                                    "remarks TEXT,"
                                    "videoPath TEXT)";
+
 
         QSqlQuery query;
 

@@ -528,58 +528,76 @@ void MainWindow::on_action_open_workspace_triggered()
 void MainWindow::openWorkspaceTable(QString table)
 {
   QMessageBox::warning(this,"提示","打开成功");
-  QString sql=("select station_number,"
-                    "video_name,"
-                    "workspace_leader,"
-                    "processing_status,"
-                    "explosive_supervisor,"
-                    "explosive_date,"
-                    "design_depth,"
-                    "design_explosive_quantity,"
-                    "video_evaluation,"
-                    "review_status,"
-                    "measured_depth,"
-                    "explosive_amount_deployed,"
-                    "identification_result from "+table);
-  this->loadTableToWidget(table,sql,ui->testWidget);  //修改到这里
+  QString sql=("select stationNumber,"
+                 "videoName,"
+                 "designDrillingDepth,"
+                 "designInitiationDepth,"
+                 "singleWellExplosiveAmount,"
+                 "quantityOfDetonatorsPerWell,"
+                 "numberOfWells,"
+                 "depthOfCharging,"
+                 "difference,"
+                 "wellSupervisor,"
+                 "inspector,"
+                 "chargingDate,"
+                 "inspectionDate,"
+                 "drillingEvaluation,"
+                 "remarks,"
+                 "videoPath from "+table);
+  this->loadTableToWidget(table,sql,ui->videoInfoTableWidget);
   workspaceOpener->close();
-
   QTreeWidgetItem *workspaceItem = new QTreeWidgetItem(ui->treeWidget);
-  workspaceItem->setText(0,workspace.workspaceName);
+  workspaceItem->setText(0,table);
 }
 
 void MainWindow::loadTableToWidget(QString tableName,QString sqlstr, QTableWidget *qTableWidget)
 {
-  QSqlQuery query,query2;
+  QSqlQuery query;
   query.prepare(sqlstr);
-  int rowCnt = 0 , column = 0;
-  if(query2.exec(sqlstr)){
-   rowCnt=query2.size();
+  if (!query.exec()) {
+        qDebug() << "Query failed: " << query.lastError().text();
+        return;
   }
-  else qDebug() << "Query failed: " << query2.lastError().text();
+  int rowCount =0;
+  int columnCount=qTableWidget->columnCount();
 
-  column=qTableWidget->columnCount();
+  qTableWidget->clearContents();
+  qTableWidget->setRowCount(0);
 
-  if(rowCnt > 0){
-        if(query.exec()){
-        for(int i=0;i<rowCnt;i++){
-            query.next();
-            for(int j=0;j<column;j++){
-        qTableWidget->setRowCount(i+1);
-        qTableWidget->setItem(i,j,new QTableWidgetItem(query.value(j).toString()));
-        qTableWidget->item(i,j)->setTextAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
-            }
+  while (query.next()) {
+        int row = rowCount++;
+        qTableWidget->insertRow(row);
+
+        //添加复选框到第一列
+        QTableWidgetItem *checkBoxItem = new QTableWidgetItem();
+        checkBoxItem->setCheckState(Qt::Unchecked);
+        qTableWidget->setItem(row, 0, checkBoxItem);
+
+        for (int column = 1; column < columnCount; ++column) {
+            QVariant value = query.value(column);
+            if(!value.isValid()){
+                qDebug()<<column;
+            }//无法得到最后一列
+            QTableWidgetItem *item = new QTableWidgetItem(query.value(column-1).toString());
+            qTableWidget->setItem(row, column, item);
+            qTableWidget->item(row,column)->setTextAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
+            if(column == 1){
+            item->setToolTip(query.value(columnCount-1).toString());
         }
-       }
-        else qDebug() << "Query failed: " << query.lastError().text();
-  }
-  else {
-        QMessageBox::warning(this,"警告","查询表的内容为空");
-  }
+    }
+}
+
   qTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   qTableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   qTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
   qTableWidget->setAlternatingRowColors(true);
+
+  //设置单元格文本对齐方式
+//  for (int row = 0; row < rowCount; ++row) {
+//        for (int column = 0; column < columnCount; ++column) {
+//            qTableWidget->item(row, column)->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+//        }
+//  }
 }
 
 
@@ -600,8 +618,8 @@ void MainWindow::on_stationnumberpushButton_clicked()
                  "identification_result FROM 表uu WHERE  station_number = 1");
   qDebug()<<currentWorkspace.workspaceName;
 
-  ui->testWidget->clearContents();
-  this->loadTableToWidget(currentWorkspace.workspaceName,sql,ui->testWidget);
+  ui->videoInfoTableWidget->clearContents();
+  this->loadTableToWidget(currentWorkspace.workspaceName,sql,ui->videoInfoTableWidget);
 }
 
 
@@ -630,4 +648,6 @@ void MainWindow::updateProgressBar(int progress)
 {
 
 }
+
+
 

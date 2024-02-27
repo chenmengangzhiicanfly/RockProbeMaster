@@ -100,5 +100,6 @@ private slots:
     void on_action_detectors_triggered();
     void updateProgressBar(int progress);
 
+    void on_startDetectionButton_MainPage_clicked();
 };
 #endif // MAINWINDOW_H
