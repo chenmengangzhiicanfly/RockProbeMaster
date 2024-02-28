@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QTableWidget>  //要封装QTableWidget的更新函数，所以把这个类包含进来
 #include <QThread>
+#include <QProgressBar>
 #include "excelreaderanddisplayer.h"
 #include "databaseinsertpage.h"
 #include <QCloseEvent>
@@ -42,12 +43,18 @@ signals:
     void goBack();
     void detectAchieved();
     void tableOpened();
+    void detectionComplete();
+    void setTotalVideoCount(int videoTotal);
+    void detectionAllComplete();
 private:
+    //画面控件
     Ui::MainWindow *ui;
     QStatusBar *statusBar;
-
     QLabel *showTimeLabel;
+    QProgressBar *videoDetectionProcessBar;
+
 private:
+
     DetectLog currentDetectlog;
     QSqlDatabase db;
 
@@ -76,6 +83,12 @@ private:
 private slots:
     void TimeUpdate();
     void DetectorSizeSet(int NewSize);
+
+    void handleDetectionCompleted();
+    void handleSetTotalVideoCount(int videoTotal);
+    void handleDetectionAllCompleted();
+
+
     void on_loadButton_clicked();
     void on_addButton_clicked();
     void on_deleteButton_clicked();
@@ -101,5 +114,7 @@ private slots:
     void updateProgressBar(int progress);
 
     void on_startDetectionButton_MainPage_clicked();
+    void on_selectAllCheckBox_stateChanged(int state);
+    void on_stationnumberlineSearch_textChanged(const QString &arg1);
 };
 #endif // MAINWINDOW_H

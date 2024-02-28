@@ -28,20 +28,11 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug()<<"主窗口的线程地址是："<<QThread::currentThread();
     DatabaseConnector::connectDatabase(db);
 
+    connect(this, &MainWindow::detectionComplete, this, &MainWindow::handleDetectionCompleted);
+    connect(this, &MainWindow::setTotalVideoCount, this, &MainWindow::handleSetTotalVideoCount);
+    connect(this,&MainWindow::detectionAllComplete,this,&MainWindow::handleDetectionAllCompleted);
     //        QtConcurrent::run([&]() {
     //        detectorManager.Init(2);
-    //        });
-
-    //        detectorManager.Init(1);
-    //        float p2;
-    //        detectorManager.DetectAsync("F:/video/6.mp4",p2, [this](DetectLog detectlog) {
-    //            currentDetectlog = detectlog;
-    //            qDebug() <<QString::fromStdString(currentDetectlog.ToString());
-
-    //            QMetaObject::invokeMethod(this, [this, detectlog]() {
-    //                currentDetectlog = detectlog;
-    //                this->ui->resultText->setText(QString::fromStdString(currentDetectlog.ToString()));
-    //            });
     //        });
 
 
@@ -52,7 +43,8 @@ MainWindow::MainWindow(QWidget *parent)
     // 无法解决
     //    LoginWidget *loginWidget = new LoginWidget();
     //    loginWidget->show();
-    //    initStatus();
+
+    initStatus();
     //    connect(loginWidget,&LoginWidget::successLogin,this,[=](){
     //        this->show();
     //    });
@@ -188,7 +180,29 @@ void MainWindow::DetectorSizeSet(int NewSize)
 {
             QtConcurrent::run([&]() {
             detectorManager.Init(2);
-            });
+    });
+}
+
+void MainWindow::handleDetectionCompleted()
+{
+    videoDetectionProcessBar->setValue(videoDetectionProcessBar->value() + 1);
+    if(videoDetectionProcessBar->value()==videoDetectionProcessBar->maximum()){
+        videoDetectionProcessBar->setVisible(false);
+        QMessageBox::information(this,"提示","检测已经全部完成");
+        emit detectionAllComplete();
+    }
+
+}
+
+void MainWindow::handleSetTotalVideoCount(int videoTotal)
+{
+    videoDetectionProcessBar->setValue(0);
+    videoDetectionProcessBar->setMaximum(videoTotal);
+}
+
+void MainWindow::handleDetectionAllCompleted()
+{
+    ui->startDetectionButton_MainPage->setEnabled(true);
 }
 
 
@@ -203,6 +217,13 @@ void MainWindow::initStatus(){
 
         // 在状态栏上添加永久标签
 //        statusBar->addPermanentWidget(new QLabel("永久标签", this));
+        //添加检查进度
+        videoDetectionProcessBar = new QProgressBar();
+        videoDetectionProcessBar->setMinimum(0);
+        videoDetectionProcessBar->setVisible(false);
+        statusBar->addWidget(videoDetectionProcessBar);
+
+
 
         QTimer *timer = new QTimer(this);
         timer->start(1000);
@@ -211,7 +232,7 @@ void MainWindow::initStatus(){
         connect(timer,&QTimer::timeout,this,&MainWindow::TimeUpdate);
 
         // 设置状态栏显示信息
-        statusBar->showMessage("欢迎使用Qt 6状态栏", 5000);  // 显示5秒后自动清除
+        /*statusBar->showMessage("欢迎使用Qt 6状态栏", 5000); */ // 显示5秒后自动清除
 
         // 添加其他的状态栏组件和信号槽连接等
 }
@@ -490,12 +511,11 @@ void MainWindow::on_action_create_triggered()
 
         if(db.open()){
             WorkspaceInfo workspaceInfo(tableName,leader,videoPath);
-            currentWorkspace=workspaceInfo;
             QTableWidget *videoshow = new QTableWidget();
 //            workspaceFileManager->insertVideoData("F:/test",workspaceInfo,videoshow);
             workspaceFileManager->insertVideoData(videoPath,workspaceInfo,videoshow);
             workspaceFileManager->saveWorkspaceInfoTOJson(workspaceInfo);
-            workspaceFileManager->createOrInsertMasterTable(currentWorkspace);   //将该表进行登记,汇总在大表中
+            workspaceFileManager->createOrInsertMasterTable(workspaceInfo);   //将该表进行登记,汇总在大表中
             workspaceFileManager->createTableInDatabase(tableName);   //建造工区- 建表
 
            workspaceFileManager->insertDataIntoTable(workspaceFileManager->videoList,workspaceInfo);
@@ -546,6 +566,7 @@ void MainWindow::openWorkspaceTable(QString table)
                  "videoPath from "+table);
   this->loadTableToWidget(table,sql,ui->videoInfoTableWidget);
   workspaceOpener->close();
+  currentWorkspace.workspaceName = table;
   QTreeWidgetItem *workspaceItem = new QTreeWidgetItem(ui->treeWidget);
   workspaceItem->setText(0,table);
 }
@@ -558,6 +579,7 @@ void MainWindow::loadTableToWidget(QString tableName,QString sqlstr, QTableWidge
         qDebug() << "Query failed: " << query.lastError().text();
         return;
   }
+
   int rowCount =0;
   int columnCount=qTableWidget->columnCount();
 
@@ -601,27 +623,6 @@ void MainWindow::loadTableToWidget(QString tableName,QString sqlstr, QTableWidge
 }
 
 
-void MainWindow::on_stationnumberpushButton_clicked()
-{
-  QString sql=("SELECT station_number,"
-                 "video_name,"
-                 "workspace_leader,"
-                 "processing_status,"
-                 "explosive_supervisor,"
-                 "explosive_date,"
-                 "design_depth,"
-                 "design_explosive_quantity,"
-                 "video_evaluation,"
-                 "review_status,"
-                 "measured_depth,"
-                 "explosive_amount_deployed,"
-                 "identification_result FROM 表uu WHERE  station_number = 1");
-  qDebug()<<currentWorkspace.workspaceName;
-
-  ui->videoInfoTableWidget->clearContents();
-  this->loadTableToWidget(currentWorkspace.workspaceName,sql,ui->videoInfoTableWidget);
-}
-
 
 void MainWindow::on_action_detectors_triggered()
 {
@@ -648,6 +649,11 @@ void MainWindow::updateProgressBar(int progress)
 {
 
 }
+
+
+
+
+
 
 
 

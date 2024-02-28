@@ -623,15 +623,41 @@
         </property>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>桩号</string>
+          <string>桩号：</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="stationnumberlineEdit"/>
+        <widget class="QLineEdit" name="stationnumberlineSearch"/>
         <widget class="QPushButton" name="stationnumberpushButton">
          <property name="text">
           <string>执行</string>
          </property>
         </widget>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_11">
+       <property name="geometry">
+        <rect>
+         <x>730</x>
+         <y>20</y>
+         <width>111</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>GroupBox</string>
+       </property>
+       <widget class="QCheckBox" name="selectAllCheckBox">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>30</y>
+          <width>80</width>
+          <height>19</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>全选</string>
+        </property>
        </widget>
       </widget>
      </widget>
@@ -678,7 +704,7 @@
       <widget class="QTableWidget" name="videoInfoTableWidget">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>50</x>
          <y>20</y>
          <width>821</width>
          <height>441</height>

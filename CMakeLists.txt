@@ -74,7 +74,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         RockProbeMaster.qrc
 
-
+        mainwindowslots.cpp
         form.h form.cpp form.ui
         registerwidget.h registerwidget.cpp registerwidget.ui
         registerwidget.cpp registerwidget.h registerwidget.ui
