@@ -10,5 +10,6 @@
         <file>images/stop.png</file>
         <file>images/videoahead.png</file>
         <file>images/voice.png</file>
+        <file>images/achieved.jpg</file>
     </qresource>
 </RCC>

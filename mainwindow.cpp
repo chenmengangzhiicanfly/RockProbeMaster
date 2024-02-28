@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::detectionComplete, this, &MainWindow::handleDetectionCompleted);
     connect(this, &MainWindow::setTotalVideoCount, this, &MainWindow::handleSetTotalVideoCount);
     connect(this,&MainWindow::detectionAllComplete,this,&MainWindow::handleDetectionAllCompleted);
+
     //        QtConcurrent::run([&]() {
     //        detectorManager.Init(2);
     //        });
@@ -468,10 +469,7 @@ void MainWindow::on_startDetectionButton_clicked()
                 QMetaObject::invokeMethod(this, [this, &completedTasks, totalTasks,filePath]() {
                     completedTasks++;  // 完成的任务数加一
 
-                    if (completedTasks >= totalTasks) {
-                        // 所有任务完成时停止计时器
 
-                    }
                     QString temp = QString("视频%1:\n药柱数量为：%2,爆炸杆数量为: %3").arg(filePath).arg(currentDetectlog.GetExplosiveRodCount()).arg(currentDetectlog.GetDepthRodCount());
 //                    this->ui->resultText->setText(QString::fromStdString(currentDetectlog.ToString()));
                     this->ui->resultText->append(temp);
@@ -656,4 +654,8 @@ void MainWindow::updateProgressBar(int progress)
 
 
 
+void MainWindow::on_action_main_triggered()
+{
+    ui->stackedWidget->setCurrentWidget(ui->mainPage);
+}
 

@@ -19,7 +19,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>1031</width>
+      <width>1021</width>
       <height>651</height>
      </rect>
     </property>
@@ -584,7 +584,7 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="page_3">
+    <widget class="QWidget" name="mainPage">
      <widget class="QGroupBox" name="groupBox_6">
       <property name="geometry">
        <rect>
@@ -704,7 +704,7 @@
       <widget class="QTableWidget" name="videoInfoTableWidget">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>10</x>
          <y>20</y>
          <width>821</width>
          <height>441</height>
@@ -895,6 +895,7 @@
    <addaction name="actionOpen"/>
    <addaction name="action_create"/>
    <addaction name="action_open_workspace"/>
+   <addaction name="action_main"/>
    <addaction name="action_D"/>
    <addaction name="actionWatch"/>
    <addaction name="actionExit"/>
@@ -968,6 +969,11 @@
   <action name="action_detectors">
    <property name="text">
     <string>检测器设置</string>
+   </property>
+  </action>
+  <action name="action_main">
+   <property name="text">
+    <string>工作界面（M）</string>
    </property>
   </action>
  </widget>

@@ -57,6 +57,7 @@ public:
     void insertDataIntoTable(QVector<VideoInfo> &videoLists,WorkspaceInfo workspace);
     void createTableInDatabase(const QString& tableName);
     void createOrInsertMasterTable(WorkspaceInfo workspaceinfo);
+
     QVector<VideoInfo> videoList;
 private:
     Ui::WorkspaceFileManager *ui;

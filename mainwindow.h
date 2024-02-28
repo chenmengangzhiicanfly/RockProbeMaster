@@ -68,16 +68,20 @@ private:
     void setupConnections();
 
     void closeEvent(QCloseEvent *event) override;
+
     QAction *actionexcelFile;
     ExcelReaderAndDisplayer * excelReaderAndDisplayer;
     DatabaseInsertPage *databaseInsertPage;
-
     DetectorManager &detectorManager;
     QMediaPlayer *mediaPlayer;
     WorkspaceFileManager *workspaceFileManager;
     WorkspaceOpener *workspaceOpener;
+
     WorkspaceInfo currentWorkspace;
+
     DetectorSizeSettings *detectorSizeSettings;
+
+
 
     float p;
 private slots:
@@ -116,5 +120,8 @@ private slots:
     void on_startDetectionButton_MainPage_clicked();
     void on_selectAllCheckBox_stateChanged(int state);
     void on_stationnumberlineSearch_textChanged(const QString &arg1);
+    void connectDetector(int row, const std::string& videoPath, int totalCount, float *p);
+    void on_videoInfoTableWidget_itemChanged(QTableWidgetItem *item);
+    void on_action_main_triggered();
 };
 #endif // MAINWINDOW_H
