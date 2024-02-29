@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
                 //        qDebug()<<driver;
 
     MainWindow w;
+
     w.show();
 
 //    DetectorSizeSettings d;

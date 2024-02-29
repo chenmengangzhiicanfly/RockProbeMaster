@@ -139,13 +139,14 @@ void WorkspaceFileManager::insertVideoData(const QString &folderPath,WorkspaceIn
                 VideoInfo videoData;
                 videoData.stationNumber = videoname;
                 videoData.videoName = video;
+                videoData.chargingDate =dateFolder;
+                videoData.wellSupervisor = workerFolder;
                 videoData.inspector = workspace.workspaceLeader;
                 videoData.designDrillingDepth = QString("10.0");
                 videoData.designInitiationDepth = QString("8.0");
                 videoData.numberOfWells = QString("1");
                 videoData.singleWellExplosiveAmount= QString("8");
                 videoData.quantityOfDetonatorsPerWell= QString("2");
-
                 videoData.videoPath = videoFolderDir.absoluteFilePath(video);
                 videoList.append(videoData);
             }
@@ -167,7 +168,7 @@ void WorkspaceFileManager::insertDataIntoTable(QVector<VideoInfo> &videoLists, W
                       ":chargingDate, :inspectionDate, :drillingEvaluation, :remarks, :videoPath)");
 
 
-        query.bindValue(":stationNumber", video.stationNumber.toInt());
+        query.bindValue(":stationNumber", video.stationNumber);
         query.bindValue(":videoName",video.videoName);
         query.bindValue(":designDrillingDepth",video.designDrillingDepth);
         query.bindValue(":designInitiationDepth", video.designInitiationDepth);
@@ -196,7 +197,7 @@ void WorkspaceFileManager::insertDataIntoTable(QVector<VideoInfo> &videoLists, W
 void WorkspaceFileManager::createTableInDatabase(const QString &tableName)
 {
  QString createTableQuery = "CREATE TABLE " + tableName + " ("
-                                   "stationNumber INT PRIMARY KEY,"
+                                   "stationNumber VARCHAR(100) PRIMARY KEY,"
                                    "videoName TEXT,"
                                    "designDrillingDepth TEXT,"
                                    "designInitiationDepth TEXT,"

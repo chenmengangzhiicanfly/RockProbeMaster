@@ -58,3 +58,7 @@ void MainWindow::on_stationnumberlineSearch_textChanged(const QString &arg1)
                  "videoPath from "+currentWorkspace.workspaceName);
   this->loadTableToWidget(currentWorkspace.workspaceName,sql,ui->videoInfoTableWidget);
 }
+void MainWindow::on_commitChangeToDatabasePushbutton_clicked()
+{
+  this->loadQTableWidgettoDatabase(currentWorkspace.workspaceName,ui->videoInfoTableWidget);
+}

@@ -660,6 +660,38 @@
         </property>
        </widget>
       </widget>
+      <widget class="QDoubleSpinBox" name="differenceThreshold">
+       <property name="geometry">
+        <rect>
+         <x>671</x>
+         <y>50</y>
+         <width>51</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_5">
+       <property name="geometry">
+        <rect>
+         <x>592</x>
+         <y>50</y>
+         <width>71</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>差值合格阈值</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_8">
       <property name="geometry">
@@ -782,7 +814,7 @@
        </column>
        <column>
         <property name="text">
-         <string>钻井结果</string>
+         <string>钻井评价</string>
         </property>
        </column>
        <column>
@@ -804,31 +836,38 @@
       <property name="title">
        <string>GroupBox</string>
       </property>
-      <widget class="QPushButton" name="startDetectionButton_MainPage">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
-         <x>890</x>
+         <x>740</x>
          <y>20</y>
-         <width>91</width>
-         <height>31</height>
+         <width>239</width>
+         <height>25</height>
         </rect>
        </property>
-       <property name="text">
-        <string>开始检测</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_4">
-       <property name="geometry">
-        <rect>
-         <x>770</x>
-         <y>20</y>
-         <width>91</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>人工复查</string>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QPushButton" name="pushButton_4">
+          <property name="text">
+           <string>人工复查</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="commitChangeToDatabasePushbutton">
+          <property name="text">
+           <string>确认写回</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="startDetectionButton_MainPage">
+          <property name="text">
+           <string>开始检测</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </widget>

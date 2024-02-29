@@ -43,9 +43,10 @@ signals:
     void goBack();
     void detectAchieved();
     void tableOpened();
-    void detectionComplete();
+    void detectionComplete(int row,double wellPath);
     void setTotalVideoCount(int videoTotal);
     void detectionAllComplete();
+
 private:
     //画面控件
     Ui::MainWindow *ui;
@@ -55,17 +56,22 @@ private:
 
 private:
 
+    QMap<QString, QString> qTableWidgetToDatabaseMap;
     DetectLog currentDetectlog;
     QSqlDatabase db;
 
     void init();
     void initMenu();
     void initStatus();
+    void initqTableWidgetToDatabaseMap(QTableWidget *qTable);
 
     void exportQtable();
     void importQtable();
     void addVideofileRow(const QString &fileName,const QString &filePath);
+    void calculateDifference(QTableWidget *currentQtableWidget,int row);
+    void updateInspectionDate(QTableWidget *currentQtableWidget, int row);
     void setupConnections();
+    void updateCellInfo(QTableWidget *qTable,int row,int column,const QString &newText);
 
     void closeEvent(QCloseEvent *event) override;
 
@@ -88,7 +94,7 @@ private slots:
     void TimeUpdate();
     void DetectorSizeSet(int NewSize);
 
-    void handleDetectionCompleted();
+    void handleDetectionCompleted(int row,double wellDepth);
     void handleSetTotalVideoCount(int videoTotal);
     void handleDetectionAllCompleted();
 
@@ -113,6 +119,7 @@ private slots:
     void on_action_open_workspace_triggered();
     void openWorkspaceTable(QString table);
     void loadTableToWidget(QString tableName,QString sqlstr,QTableWidget *qTableWidget);
+    void loadQTableWidgettoDatabase(QString tableName,QTableWidget *qTableWidget);
     void on_stationnumberpushButton_clicked();
     void on_action_detectors_triggered();
     void updateProgressBar(int progress);
@@ -123,5 +130,6 @@ private slots:
     void connectDetector(int row, const std::string& videoPath, int totalCount, float *p);
     void on_videoInfoTableWidget_itemChanged(QTableWidgetItem *item);
     void on_action_main_triggered();
+    void on_commitChangeToDatabasePushbutton_clicked();
 };
 #endif // MAINWINDOW_H

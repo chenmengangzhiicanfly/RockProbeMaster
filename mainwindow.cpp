@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug()<<"主窗口的线程地址是："<<QThread::currentThread();
     DatabaseConnector::connectDatabase(db);
 
+    initqTableWidgetToDatabaseMap(ui->videoInfoTableWidget);
+
     connect(this, &MainWindow::detectionComplete, this, &MainWindow::handleDetectionCompleted);
     connect(this, &MainWindow::setTotalVideoCount, this, &MainWindow::handleSetTotalVideoCount);
     connect(this,&MainWindow::detectionAllComplete,this,&MainWindow::handleDetectionAllCompleted);
@@ -62,6 +64,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupConnections(){
 
+}
+
+void MainWindow::updateCellInfo(QTableWidget *qTable, int row, int column, const QString &newText)
+{
+    QTableWidgetItem *newItem = new QTableWidgetItem(newText);
+    qTable->setItem(row,column,newItem);
 }
 
 void MainWindow::updateQTableWidget(QTableWidget *&qTableWidget)
@@ -184,8 +192,12 @@ void MainWindow::DetectorSizeSet(int NewSize)
     });
 }
 
-void MainWindow::handleDetectionCompleted()
+void MainWindow::handleDetectionCompleted(int row,double wellDepth)
 {
+    QString wellDepthstr = QString::number(wellDepth,'f',1);
+    this->updateCellInfo(ui->videoInfoTableWidget,row,8,wellDepthstr);
+    this->calculateDifference(ui->videoInfoTableWidget,row);
+    this->updateInspectionDate(ui->videoInfoTableWidget,row);
     videoDetectionProcessBar->setValue(videoDetectionProcessBar->value() + 1);
     if(videoDetectionProcessBar->value()==videoDetectionProcessBar->maximum()){
         videoDetectionProcessBar->setVisible(false);
@@ -236,6 +248,32 @@ void MainWindow::initStatus(){
         /*statusBar->showMessage("欢迎使用Qt 6状态栏", 5000); */ // 显示5秒后自动清除
 
         // 添加其他的状态栏组件和信号槽连接等
+}
+
+void MainWindow::initqTableWidgetToDatabaseMap(QTableWidget *qTable)
+{
+        QStringList tableList={
+            "stationNumber",
+            "videoName",
+            "designDrillingDepth",
+            "designInitiationDepth",
+            "singleWellExplosiveAmount",
+            "quantityOfDetonatorsPerWell",
+            "numberOfWells",
+            "depthOfCharging",
+            "difference",
+            "wellSupervisor",
+            "inspector",
+            "chargingDate",
+            "inspectionDate",
+            "drillingEvaluation",
+            "remarks"
+        };
+    for(int col=1;col < qTable->columnCount();col++){
+        QString columnName = qTable->horizontalHeaderItem(col)->text();
+        qTableWidgetToDatabaseMap[columnName] = tableList.at(col-1);
+    }
+
 }
 
 
@@ -506,7 +544,6 @@ void MainWindow::on_action_create_triggered()
         QString tableName = workspaceFileManager->tableNameEdit->text();
         QString leader = workspaceFileManager->leader->text();
         QString videoPath=workspaceFileManager->videoPath->text();
-
         if(db.open()){
             WorkspaceInfo workspaceInfo(tableName,leader,videoPath);
             QTableWidget *videoshow = new QTableWidget();
@@ -617,8 +654,70 @@ void MainWindow::loadTableToWidget(QString tableName,QString sqlstr, QTableWidge
 //        for (int column = 0; column < columnCount; ++column) {
 //            qTableWidget->item(row, column)->setTextAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 //        }
-//  }
+  //  }
 }
+
+void MainWindow::loadQTableWidgettoDatabase(QString tableName, QTableWidget *qTableWidget)
+{
+  // 检查传入的参数是否有效
+  if (tableName.isEmpty()  || qTableWidget == nullptr) {
+    qDebug() << "Invalid input parameters.";
+    return;
+  }
+
+  // 连接数据库
+  QSqlDatabase db = QSqlDatabase::database(); // 使用默认的数据库连接
+  if (!db.isValid()) {
+    qDebug() << "Database is not valid.";
+    return;
+  }
+
+  // 开始事务
+  if (!db.transaction()) {
+    qDebug() << "Failed to start transaction:" << db.lastError().text();
+    return;
+  }
+
+  // 准备更新数据的 SQL 语句
+  QString updateSql = "UPDATE " + tableName + " SET ";
+  int columnCount = qTableWidget->columnCount();
+
+  // 逐行遍历 QTableWidget，并更新数据库中的记录
+  for (int row = 0; row < qTableWidget->rowCount(); ++row) {
+    QString setValues;
+    for (int col = 1; col < columnCount; ++col) {
+        QTableWidgetItem *item = qTableWidget->item(row, col);
+        if (item) {
+            QString columnName = qTableWidget->horizontalHeaderItem(col)->text();
+            setValues += qTableWidgetToDatabaseMap[columnName] + "='" + item->text() + "'";
+            if (col < columnCount - 1) {
+                setValues += ",";
+            }
+        }
+    }
+
+    QString updateQuery = updateSql + setValues + " WHERE stationNumber = "+qTableWidget->item(row,1)->text();
+    QSqlQuery query;
+    if (!query.exec(updateQuery)) {
+        qDebug() << "Failed to update data:" << query.lastError().text();
+        db.rollback(); // 回滚事务
+        return;
+    }
+  }
+
+  // 提交事务
+  if (!db.commit()) {
+    qDebug() << "Failed to commit transaction:" << db.lastError().text();
+    return;
+  }
+
+  qDebug() << "Data successfully updated in database.";
+}
+
+
+
+
+
 
 
 
@@ -648,14 +747,11 @@ void MainWindow::updateProgressBar(int progress)
 
 }
 
-
-
-
-
-
-
 void MainWindow::on_action_main_triggered()
 {
     ui->stackedWidget->setCurrentWidget(ui->mainPage);
 }
+
+
+
 

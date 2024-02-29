@@ -123,7 +123,7 @@ void MainWindow::on_startDetectionButton_MainPage_clicked()
 void MainWindow::connectDetector(int row, const std::string& videoPath, int totalCount, float *p)
 {
     QTimer *progressTimer = new QTimer(this);
-    progressTimer->setInterval(0.05);
+    progressTimer->setInterval(50);
 
     // 连接定时器的槽函数
     //
@@ -137,16 +137,15 @@ void MainWindow::connectDetector(int row, const std::string& videoPath, int tota
 
     // 调用异步检测功能，传递当前行的数据
     detectorManager.DetectAsync(videoPath, *p, [this, row, totalCount,videoPath,p,progressTimer](DetectLog detectlog) {
-
-        emit detectionComplete();
+    float welldepth = 0.5 * detectlog.GetExplosiveRodCount() + 3.0 * detectlog.GetDepthRodCount();
+    emit detectionComplete(row,welldepth);
 
 
 //        QString temp = QString("视频%1:\n药柱数量为：%2,爆炸杆数量为: %3").arg(videoPath).arg(currentDetectlog.GetExplosiveRodCount()).arg(currentDetectlog.GetDepthRodCount());
-        float welldepth = 0.5 * detectlog.GetExplosiveRodCount() + 3.0 * detectlog.GetDepthRodCount();
-        QMetaObject::invokeMethod(this, [this, row,welldepth]() {
-            QTableWidgetItem *wellDepthItem = new QTableWidgetItem(QString::number(welldepth));
-            ui->videoInfoTableWidget->setItem(row, 8, wellDepthItem);
 
+        QMetaObject::invokeMethod(this, [this, row,welldepth]() {
+//            QTableWidgetItem *wellDepthItem = new QTableWidgetItem(QString::number(welldepth));
+//            ui->videoInfoTableWidget->setItem(row, 8, wellDepthItem);
         });
         progressTimer->stop();
         delete p;
@@ -154,6 +153,53 @@ void MainWindow::connectDetector(int row, const std::string& videoPath, int tota
 
     });
 }
+void MainWindow::calculateDifference(QTableWidget *currentQtableWidget, int row)
+{
+    if (currentQtableWidget == nullptr || currentQtableWidget->rowCount() == 0 || currentQtableWidget->columnCount() == 0) {
+        QMessageBox::critical(this, "Error", "Table is empty.");
+        return;
+    }
+
+    if (currentQtableWidget->item(row, 4) == nullptr || currentQtableWidget->item(row, 8) == nullptr) {
+        QMessageBox::critical(this, "Error", "Columns 5 and 9 must have values.");
+        return;
+    }
+
+    double value1 = currentQtableWidget->item(row, 4)->text().toDouble();
+    double value2 = currentQtableWidget->item(row, 8)->text().toDouble();
+
+    double difference = value2 - value1;
+
+    QString differenceStr;
+    if(difference>0){
+        differenceStr = QString("+") +QString::number(difference,'f',1);
+    }
+    else if(difference<0){
+        differenceStr = QString("-") +QString::number(qAbs(difference),'f',1);
+    }
+    else differenceStr = QString::number(difference,'f',1);
+    this->updateCellInfo(currentQtableWidget,row,9,differenceStr);
+
+}
+
+void MainWindow::updateInspectionDate(QTableWidget *currentQtableWidget, int row)
+{
+    if (currentQtableWidget == nullptr || currentQtableWidget->rowCount() == 0 || currentQtableWidget->columnCount() == 0) {
+        QMessageBox::critical(this, "Error", "Table is empty.");
+        return;
+    }
+
+    // 获取当前日期
+    QDate currentDate = QDate::currentDate();
+
+    // 格式化日期为指定格式（11月6日）
+    QString formattedCheckDate = QString("%1月%2日").arg(currentDate.toString("M")).arg(currentDate.toString("d"));
+
+    // 在第十四列更新检查日期
+    QTableWidgetItem *checkDateItem = new QTableWidgetItem(formattedCheckDate);
+    currentQtableWidget->setItem(row, 13, checkDateItem);
+}
+
 void MainWindow::on_videoInfoTableWidget_itemChanged(QTableWidgetItem *item)
 {
     if (item && item->column() == 15) { // 检查是否为指定的列
@@ -168,6 +214,11 @@ void MainWindow::on_videoInfoTableWidget_itemChanged(QTableWidgetItem *item)
             // 在单元格中设置图标和文本
             QTableWidgetItem *newItem = new QTableWidgetItem(icon, "已处理");
             ui->videoInfoTableWidget->setItem(curRow, curColumn, newItem);
+        }
+    }
+    if (item && item->column() == 9){
+        if(qAbs(item->text().toDouble())>ui->differenceThreshold->text().toDouble()){
+            item->setBackground(Qt::red);
         }
     }
 }

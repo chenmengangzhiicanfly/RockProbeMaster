@@ -13,3 +13,4 @@ void MainWindow::addVideofileRow(const QString &fileName,const QString &filePath
     ui->videoWidget_2->setCellWidget(row,0,checkBox);
     ui->videoWidget_2->setItem(row,1,item);
 }
+
