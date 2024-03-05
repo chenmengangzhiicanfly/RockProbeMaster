@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::detectionComplete, this, &MainWindow::handleDetectionCompleted);
     connect(this, &MainWindow::setTotalVideoCount, this, &MainWindow::handleSetTotalVideoCount);
     connect(this,&MainWindow::detectionAllComplete,this,&MainWindow::handleDetectionAllCompleted);
-
+    connect(this, &MainWindow::deleteTimerAndPointer, this, &MainWindow::deleteTimerAndPointerSlot);
     //        QtConcurrent::run([&]() {
     //        detectorManager.Init(2);
     //        });
@@ -195,7 +195,7 @@ void MainWindow::DetectorSizeSet(int NewSize)
 void MainWindow::handleDetectionCompleted(int row,double wellDepth)
 {
     QString wellDepthstr = QString::number(wellDepth,'f',1);
-    this->updateCellInfo(ui->videoInfoTableWidget,row,8,wellDepthstr);
+    this->updateCellInfo(ui->videoInfoTableWidget,row,10,wellDepthstr);
     this->calculateDifference(ui->videoInfoTableWidget,row);
     this->updateInspectionDate(ui->videoInfoTableWidget,row);
     videoDetectionProcessBar->setValue(videoDetectionProcessBar->value() + 1);
@@ -204,7 +204,6 @@ void MainWindow::handleDetectionCompleted(int row,double wellDepth)
         QMessageBox::information(this,"提示","检测已经全部完成");
         emit detectionAllComplete();
     }
-
 }
 
 void MainWindow::handleSetTotalVideoCount(int videoTotal)
@@ -260,6 +259,8 @@ void MainWindow::initqTableWidgetToDatabaseMap(QTableWidget *qTable)
             "singleWellExplosiveAmount",
             "quantityOfDetonatorsPerWell",
             "numberOfWells",
+            "processingStatus",
+            "reviewStatus",
             "depthOfCharging",
             "difference",
             "wellSupervisor",
@@ -541,15 +542,16 @@ void MainWindow::on_startDetectionButton_2_clicked()
 void MainWindow::on_action_create_triggered()
 {
   if(workspaceFileManager->exec()==QDialog::Accepted){
-        QString tableName = workspaceFileManager->tableNameEdit->text();
+        QString tableName = workspaceFileManager->workspace->text();
         QString leader = workspaceFileManager->leader->text();
-        QString videoPath=workspaceFileManager->videoPath->text();
+        QString videoPath = workspaceFileManager->videoPath->text();
+        QString excelPath = workspaceFileManager->workspaceExcel->text();
         if(db.open()){
-            WorkspaceInfo workspaceInfo(tableName,leader,videoPath);
+            WorkspaceInfo workspaceInfo(tableName,leader,videoPath,excelPath);
             QTableWidget *videoshow = new QTableWidget();
 //            workspaceFileManager->insertVideoData("F:/test",workspaceInfo,videoshow);
-            workspaceFileManager->insertVideoData(videoPath,workspaceInfo,videoshow);
-            workspaceFileManager->saveWorkspaceInfoTOJson(workspaceInfo);
+            workspaceFileManager->insertVideoData(workspaceInfo,videoshow);
+//            workspaceFileManager->saveWorkspaceInfoTOJson(workspaceInfo);
             workspaceFileManager->createOrInsertMasterTable(workspaceInfo);   //将该表进行登记,汇总在大表中
             workspaceFileManager->createTableInDatabase(tableName);   //建造工区- 建表
 
@@ -560,7 +562,7 @@ void MainWindow::on_action_create_triggered()
         } else {
             QMessageBox::warning(this, "Database Error", "Failed to open the database!");
         }
-        workspaceFileManager->tableNameEdit->clear();
+        workspaceFileManager->workspace->clear();
 
   }
 }
@@ -590,6 +592,8 @@ void MainWindow::openWorkspaceTable(QString table)
                  "singleWellExplosiveAmount,"
                  "quantityOfDetonatorsPerWell,"
                  "numberOfWells,"
+                 "processingStatus,"
+                 "reviewStatus,"
                  "depthOfCharging,"
                  "difference,"
                  "wellSupervisor,"
@@ -739,6 +743,8 @@ void MainWindow::on_action_detectors_triggered()
 
       // 等待线程完成
       future.waitForFinished();
+      detectorSizeSettings->close();
+      this->isDetectorInitialized=true;
   });
 }
 

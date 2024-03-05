@@ -7,6 +7,7 @@ DetectorSizeSettings::DetectorSizeSettings(QWidget *parent) :
     ui(new Ui::DetectorSizeSettings)
 {
     ui->setupUi(this);
+    setWindowTitle("系统设置");
     QVBoxLayout *verticalLayout = new QVBoxLayout(this);
     spinBox->setMinimum(1);
     spinBox->setMaximum(100);

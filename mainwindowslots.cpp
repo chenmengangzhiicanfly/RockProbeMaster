@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-
+#include<QTimer>
 
 void MainWindow::on_selectAllCheckBox_stateChanged(int state)
 {
@@ -61,4 +61,12 @@ void MainWindow::on_stationnumberlineSearch_textChanged(const QString &arg1)
 void MainWindow::on_commitChangeToDatabasePushbutton_clicked()
 {
   this->loadQTableWidgettoDatabase(currentWorkspace.workspaceName,ui->videoInfoTableWidget);
+}
+
+void MainWindow::deleteTimerAndPointerSlot(QTimer *timer, float *p)
+{
+  qDebug()<<"析构一个定时器和float";
+  timer->stop();
+  delete timer;
+  delete p;
 }

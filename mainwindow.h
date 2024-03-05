@@ -47,6 +47,8 @@ signals:
     void setTotalVideoCount(int videoTotal);
     void detectionAllComplete();
 
+    void deleteTimerAndPointer(QTimer *timer, float *p);
+
 private:
     //画面控件
     Ui::MainWindow *ui;
@@ -55,6 +57,8 @@ private:
     QProgressBar *videoDetectionProcessBar;
 
 private:
+
+    bool isDetectorInitialized=false;
 
     QMap<QString, QString> qTableWidgetToDatabaseMap;
     DetectLog currentDetectlog;
@@ -131,5 +135,8 @@ private slots:
     void on_videoInfoTableWidget_itemChanged(QTableWidgetItem *item);
     void on_action_main_triggered();
     void on_commitChangeToDatabasePushbutton_clicked();
+
+
+    void deleteTimerAndPointerSlot(QTimer *timer, float *p);
 };
 #endif // MAINWINDOW_H

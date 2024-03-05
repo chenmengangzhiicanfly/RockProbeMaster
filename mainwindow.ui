@@ -698,7 +698,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>151</width>
+        <width>161</width>
         <height>571</height>
        </rect>
       </property>
@@ -708,10 +708,10 @@
       <widget class="QTreeWidget" name="treeWidget">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>131</width>
-         <height>531</height>
+         <x>0</x>
+         <y>20</y>
+         <width>151</width>
+         <height>541</height>
         </rect>
        </property>
        <column>
@@ -784,6 +784,16 @@
        </column>
        <column>
         <property name="text">
+         <string>处理状态</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>是否复查</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string>下药深度</string>
         </property>
        </column>
@@ -836,7 +846,7 @@
       <property name="title">
        <string>GroupBox</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>740</x>

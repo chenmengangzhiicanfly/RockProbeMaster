@@ -22,7 +22,7 @@ void DatabaseConnector::connectDatabase(QSqlDatabase &db)
   db.setPort(3306);
   db.setUserName("root");
   db.setPassword("123456");
-  db.setDatabaseName("rock");
+  db.setDatabaseName("rock2");
   if (!db.open()) {
     QMessageBox::critical(nullptr, "错误", db.lastError().text());
     }
