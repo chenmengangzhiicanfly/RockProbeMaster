@@ -135,7 +135,7 @@ void MainWindow::connectDetector(int row, const std::string& videoPath, int tota
         int progressValue = (*p) * 100;
         ui->videoInfoTableWidget->item(row, 8)->setText(QString::number(progressValue)+'%');
         if(progressValue==100){
-            this->ui->videoInfoTableWidget->item(row,8)->setText("已处理");
+//            this->ui->videoInfoTableWidget->item(row,8)->setText("已处理");
             qDebug()<<"析构中";
             delete progressTimer;
             delete p;

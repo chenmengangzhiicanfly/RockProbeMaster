@@ -13,5 +13,27 @@
         <file>images/achieved.jpg</file>
         <file>images/project.png</file>
         <file>images/file.png</file>
+        <file>images/24gf-stop.png</file>
+        <file>images/find.png</file>
+        <file>images/start.png</file>
+        <file>images/update.png</file>
+        <file>images/open.png</file>
+        <file>images/push.png</file>
+        <file>images/shaixuan.png</file>
+        <file>images/daochu.png</file>
+        <file>images/create.png</file>
+        <file>images/review.png</file>
+    </qresource>
+    <qresource prefix="/qsstemplate">
+        <file>QSS/AMOLED.qss</file>
+        <file>QSS/Aqua.qss</file>
+        <file>QSS/ConsoleStyle.qss</file>
+        <file>QSS/dracula.qss</file>
+        <file>QSS/ElegantDark.qss</file>
+        <file>QSS/MacOS.qss</file>
+        <file>QSS/ManjaroMix.qss</file>
+        <file>QSS/MaterialDark.qss</file>
+        <file>QSS/NeonButtons.qss</file>
+        <file>QSS/Ubuntu.qss</file>
     </qresource>
 </RCC>

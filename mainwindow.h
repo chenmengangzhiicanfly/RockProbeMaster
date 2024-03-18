@@ -77,7 +77,7 @@ private:
     void updateInspectionDate(QTableWidget *currentQtableWidget, int row);
     void setupConnections();
     void updateCellInfo(QTableWidget *qTable,int row,int column,const QString &newText);
-
+    void updateCurrentDatabase(int row,QString tableName,QTableWidget *qTableWidget);
     void closeEvent(QCloseEvent *event) override;
 
     QAction *actionexcelFile;
@@ -98,6 +98,8 @@ private:
 
     QStandardItemModel* model;
     QStandardItemModel* filtermodel;
+    QToolBar* videotableBar;
+    QToolBar* workspaceBar;
 private slots:
     void TimeUpdate();
     void DetectorSizeSet(int NewSize);
@@ -164,6 +166,15 @@ private slots:
     void on_pushButton_6_clicked();
     void exportWorkSpaceExcel(QStringList workspace);
 
+    void workspacetreelistInit();
+    void workspacetableInit();
+
+    void on_pushButton_4_clicked();
+    void filterwidgetshow();
+    void stationnumbersearchshow();
+    void on_action_triggered();
+    void themeInit();
+    void themechange();
 
 };
 #endif // MAINWINDOW_H

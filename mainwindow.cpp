@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     initqTableWidgetToDatabaseMap(ui->videoInfoTableWidget);
 
     filterInit();
-    ui->groupBox_6->setFlat(true);
+//    ui->groupBox_6->setFlat(true);
     model = new QStandardItemModel(this);
     model->setColumnCount(1);//设置为2列
     ui->treeView->setHeaderHidden(false);//设置列头可见
@@ -54,12 +54,17 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
+
+
+
+
     connect(this, &MainWindow::detectionComplete, this, &MainWindow::handleDetectionCompleted);
     connect(this, &MainWindow::setTotalVideoCount, this, &MainWindow::handleSetTotalVideoCount);
     connect(this,&MainWindow::detectionAllComplete,this,&MainWindow::handleDetectionAllCompleted);
     connect(this, &MainWindow::deleteTimerAndPointer, this, &MainWindow::deleteTimerAndPointerSlot);
-
-
+    workspacetreelistInit();
+    workspacetableInit();
+    themeInit();
 
 
 
@@ -84,6 +89,119 @@ MainWindow::MainWindow(QWidget *parent)
     //        setupConnections();
 
 }
+void MainWindow::workspacetreelistInit()
+{
+    ui->pushButton->hide();
+    ui->pushButton_4->hide();
+    ui->pushButton_5->hide();
+    ui->commitChangeToDatabasePushbutton->hide();
+    ui->startDetectionButton_MainPage->hide();
+
+
+    workspaceBar = new QToolBar(this);
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->setSpacing(1);
+    layout->setContentsMargins(1,1,1,1);
+    layout->addWidget(workspaceBar);
+    workspaceBar->layout()->setContentsMargins(1,1,1,1);
+    workspaceBar->layout()->setSpacing(1);
+    layout->addWidget(ui->treeView);
+    QSize iconsize(15,15);
+    workspaceBar->setIconSize(iconsize);
+    QAction* myAction = new QAction(QIcon(":/videoWidget/images/create.png"), "创建工区", this);
+
+    workspaceBar->addAction(myAction);
+    QAction* myAction1 = new QAction(QIcon(":/videoWidget/images/update.png"), "更新日期", this);
+    workspaceBar->addAction(myAction1);
+    QAction* myAction2 = new QAction(QIcon(":/videoWidget/images/open.png"), "打开工区", this);
+    workspaceBar->addAction(myAction2);
+    QAction* myAction3 = new QAction(QIcon(":/videoWidget/images/find.png"), "查找", this);
+    workspaceBar->addAction(myAction3);
+    ui->workspacewidget->setLayout(layout);
+    connect(myAction,&QAction::triggered,this,&MainWindow::on_action_create_triggered);
+    connect(myAction1,&QAction::triggered,this,&MainWindow::on_pushButton_clicked);
+    connect(myAction2,&QAction::triggered,this,&MainWindow::on_action_open_workspace_triggered);
+//    connect(myAction3,&QAction::triggered,this,&MainWindow::on_action_open_workspace_triggered);
+
+}
+
+void MainWindow::workspacetableInit()
+{
+    QSize iconsize(15,15);
+    videotableBar = new QToolBar(ui->tablewidget);
+    videotableBar->layout()->setContentsMargins(1,1,1,1);
+    videotableBar->layout()->setSpacing(10);
+    videotableBar->setIconSize(iconsize);
+    QVBoxLayout* layout1 = new QVBoxLayout();
+    layout1->addWidget(videotableBar);
+    layout1->addWidget(ui->videoInfoTableWidget);
+//    layout1->addWidget(ui->treeView);
+    layout1->setSpacing(1);
+    layout1->setContentsMargins(1,1,1,1);
+    QAction* myAction0 = new QAction(QIcon(":/videoWidget/images/shaixuan.png"), "筛选", this);
+    videotableBar->addAction(myAction0);
+    QAction* myAction11 = new QAction(QIcon(":/videoWidget/images/find.png"), "查找桩号", this);
+    videotableBar->addAction(myAction11);
+    QAction* myAction21 = new QAction(QIcon(":/videoWidget/images/update.png"), "更新列表", this);
+    videotableBar->addAction(myAction21);
+    QAction* myAction31 = new QAction(QIcon(":/videoWidget/images/start.png"), "开始检测", this);
+    videotableBar->addAction(myAction31);
+    QAction* myAction41 = new QAction(QIcon(":/videoWidget/images/24gf-stop.png"), "停止检测", this);
+    videotableBar->addAction(myAction41);
+    QAction* myAction51 = new QAction(QIcon(":/videoWidget/images/push.png"), "上传数据", this);
+    videotableBar->addAction(myAction51);
+    QAction* myAction61 = new QAction(QIcon(":/videoWidget/images/review.png"), "视频复查", this);
+    videotableBar->addAction(myAction61);
+
+    videotableBar->addSeparator();
+    videotableBar->addWidget(ui->label_5);
+    videotableBar->addWidget(ui->differenceThreshold);
+    ui->tablewidget->setLayout(layout1);
+    QWidget* spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    // 将伸缩的空白小部件添加到工具栏
+    videotableBar->addWidget(spacer);
+
+//    QCheckBox *checkbox = new QCheckBox("全选", this);
+    videotableBar->addWidget(ui->selectAllCheckBox);
+//    connect(myAction0,&QAction::triggered,this,&MainWindow::on_pushButton_clicked);
+
+    ui->widget_2->hide();
+//    ui->widget_2->setStyleSheet("background-color: white;");
+
+    connect(myAction21,&QAction::triggered,this,&MainWindow::on_pushButton_clicked);
+    connect(myAction31,&QAction::triggered,this,&MainWindow::on_startDetectionButton_MainPage_clicked);
+    connect(myAction41,&QAction::triggered,this,&MainWindow::on_pushButton_clicked);
+    connect(myAction51,&QAction::triggered,this,&MainWindow::on_commitChangeToDatabasePushbutton_clicked);
+    connect(myAction0,&QAction::triggered,this,&MainWindow::filterwidgetshow);
+    connect(myAction11,&QAction::triggered,this,&MainWindow::stationnumbersearchshow);
+
+
+    //    connect(myAction0,&QAction::triggered, [&]{
+//        if(!ui->widget->isVisible()){
+//            int x=videotableBar->x()+videotableBar->height();
+//            int y=videotableBar->y();
+//            ui->widget->show();
+////            ui->widget->move(x,y);
+//        }else{
+//            ui->widget->hide();
+//        }
+//    });
+//    connect(myAction11,&QAction::triggered, [&]{
+//        if(!ui->widget->isVisible()){
+//            int x=videotableBar->x()+videotableBar->height();
+//            int y=videotableBar->y();
+//            ui->videoWidget_2->show();
+//            ui->videoWidget_2->move(x,y);
+//        }else{
+//            ui->videoWidget_2->hide();
+//        }
+//    });
+//    connect(myAction61,&QAction::triggered,this,&MainWindow::on_pushButton_4_clicked);
+//    connect(checkbox,&QCheckBox::stateChanged,this,&MainWindow::on_selectAllCheckBox_stateChanged);
+//    connect(myAction0)
+}
 
 MainWindow::~MainWindow()
 {
@@ -99,6 +217,11 @@ void MainWindow::updateCellInfo(QTableWidget *qTable, int row, int column, const
 {
     QTableWidgetItem *newItem = new QTableWidgetItem(newText);
     qTable->setItem(row,column,newItem);
+}
+
+void MainWindow::updateCurrentDatabase(int row, QString tableName, QTableWidget *qTableWidget)
+{
+
 }
 
 void MainWindow::updateQTableWidget(QTableWidget *&qTableWidget)
@@ -223,10 +346,16 @@ void MainWindow::DetectorSizeSet(int NewSize)
 
 void MainWindow::handleDetectionCompleted(int row,double wellDepth)
 {
+    //表内数据的刷新
     QString wellDepthstr = QString::number(wellDepth,'f',1);
     this->updateCellInfo(ui->videoInfoTableWidget,row,10,wellDepthstr);
     this->calculateDifference(ui->videoInfoTableWidget,row);
     this->updateInspectionDate(ui->videoInfoTableWidget,row);
+    this->ui->videoInfoTableWidget->item(row,8)->setText("已处理");
+
+    //更新数据库
+    this->updateCurrentDatabase(row,this->currentWorkspace.workspaceName,ui->videoInfoTableWidget);
+
     videoDetectionProcessBar->setValue(videoDetectionProcessBar->value() + 1);
     if(videoDetectionProcessBar->value()==videoDetectionProcessBar->maximum()){
         videoDetectionProcessBar->setVisible(false);
@@ -997,6 +1126,7 @@ void MainWindow::exportWorkSpaceExcel(QStringList workspace)
     videoByDateExcel(sql);
 }
 
+
 void MainWindow::unqualifiledVideoExcel(QString workspacelist)
 {
 
@@ -1387,28 +1517,30 @@ void MainWindow::filterInit()
 {
 //    ui->treeView_2->setWindowFlags(Qt::WindowStaysOnTopHint);
     ui->treeView_2->setAttribute(Qt::WA_Hover,true);
-    ui->treeView_2->viewport()->installEventFilter(this);
+//    ui->treeView_2->viewport()->installEventFilter(this);
     filtermodel = new QStandardItemModel(this);
     ui->treeView_2->setEditTriggers(QTreeView::NoEditTriggers);//设置双击不能编辑
     ui->treeView_2->setModel(filtermodel);
     ui->treeView_2->setHeaderHidden(true);//设置列头可见
+    ui->widget->hide();
+//    ui->widget->setStyleSheet("background-color: white;");
 //    ui->treeView_2->verticalHeader()->hide();
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if(obj==ui->treeView_2->viewport()&&event->type()==QEvent::Enter){
-//        qDebug()<<"enter\n";
-        ui->groupBox_6->setFixedHeight(250);
-        ui->treeView_2->setFixedSize(170,180);
-    };
-    if (obj == ui->treeView_2->viewport() && event->type() == QEvent::Leave)
-    {
+//    if(obj==ui->treeView_2->viewport()&&event->type()==QEvent::Enter){
+////        qDebug()<<"enter\n";
+////        ui->groupBox_6->setFixedHeight(250);
+//        ui->treeView_2->setFixedSize(170,180);
+//    };
+//    if (obj == ui->treeView_2->viewport() && event->type() == QEvent::Leave)
+//    {
 
-//        qDebug()<<"leave\n";
-        ui->groupBox_6->setFixedHeight(71);
-        ui->treeView_2->setFixedSize(170,30);
-    }
+////        qDebug()<<"leave\n";
+////        ui->groupBox_6->setFixedHeight(71);
+//        ui->treeView_2->setFixedSize(170,30);
+//    }
     return QObject::eventFilter(obj, event);
 }
 
@@ -1623,4 +1755,90 @@ void MainWindow::on_pushButton_6_clicked()
 
 }
 
+
+
+void MainWindow::on_pushButton_4_clicked()
+{
+
+}
+
+void MainWindow::filterwidgetshow()
+{
+    if(!ui->widget->isVisible()){
+        int x=ui->tablewidget->x()+1;
+        int y=ui->tablewidget->y()+videotableBar->height()+2;
+//        qDebug()<<x<<" "<<y<<"\n";
+//        videotableBar->pos();
+        ui->widget->show();
+        ui->widget->move(x,y);
+    }else{
+        ui->widget->hide();
+    }
+}
+
+void MainWindow::stationnumbersearchshow()
+{
+    if(!ui->widget_2->isVisible()){
+//        int x=workspaceBar->x()+workspaceBar->height();
+//        int y=workspaceBar->y();
+        int x=ui->tablewidget->x()+2;
+        int y=ui->tablewidget->y()+videotableBar->height()+1;
+
+        ui->widget_2->show();
+        ui->widget_2->move(x,y);
+    }else{
+        ui->widget_2->hide();
+    }
+}
+
+
+void MainWindow::on_action_triggered()
+{
+    this->setStyleSheet("");
+}
+
+void MainWindow::themeInit()
+{
+    QDir dir(":/qsstemplate/QSS");
+    if (!dir.exists()) {
+        qDebug() << "The specified directory does not exist.";
+//              return QStringList();
+    }
+//    dir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+    QStringList fileList = dir.entryList(QDir::Files);
+//    QFileInfoList subfolders = dir.entryInfoList();
+//    QStringList subfolderNames;
+//    foreach (const QFileInfo& subfolderInfo, fileList) {
+//        QString a=subfolderInfo.fileName();
+//        a.chop(4);
+//        qDebug()<<a<<"\n";
+//       subfolderNames << a;
+//    }
+    foreach (const QString& subfileName, fileList) {
+        QString the=subfileName;
+        the.chop(4);
+        qDebug()<<the<<"\n";
+        QAction* act=new QAction(the,this);
+        ui->menu_5->addAction(act);
+        connect(act,&QAction::triggered,this,&MainWindow::themechange);
+    }
+}
+
+void MainWindow::themechange()
+{
+    QAction* action = qobject_cast<QAction*>(sender());
+    if (action)
+    {
+        QString text = action->text();
+        text=text+".qss";
+        // 现在你可以使用 text 变量来处理该 QAction 的文本
+        QFile styleFile(":/qsstemplate/QSS/"+text);
+        styleFile.open(QFile::ReadOnly);
+        QString styleSheet = QLatin1String(styleFile.readAll());
+        this->setStyleSheet(styleSheet);
+    }
+
+
+
+}
 
